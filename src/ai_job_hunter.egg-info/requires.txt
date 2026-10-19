@@ -1,0 +1,11 @@
+httpx<1,>=0.27
+pydantic<3,>=2.7
+PyYAML<7,>=6
+beautifulsoup4<5,>=4.12
+
+[ai]
+openai-agents>=0.2
+
+[dev]
+pytest<10,>=8
+respx<1,>=0.21

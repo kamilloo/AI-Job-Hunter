@@ -1,0 +1,35 @@
+# Extracted and normalized from job_search_overview.txt (2026-10-19).
+location: Poland
+timezone: Europe/Warsaw
+remote_requirement: fully_remote_poland
+contracts: [B2B, UoP, EOR, international_contractor]
+monthly_floor_pln: 22000
+preferred_b2b_monthly_pln: [25000, 30000]
+min_hourly_pln: 140
+primary_titles:
+  - senior backend engineer
+  - senior php developer
+  - senior software engineer
+  - senior product engineer
+  - senior platform engineer
+  - senior integration engineer
+  - backend-focused full-stack engineer
+transition_titles:
+  - site reliability engineer
+  - platform reliability engineer
+  - engineering productivity engineer
+  - database reliability engineer
+  - data engineer
+  - ai engineer
+  - ai platform engineer
+  - solutions engineer
+core_skills: [php, laravel, symfony, yii, postgresql, mysql, redis, elasticsearch, sql, rest, api, integrations, docker, aws, ci/cd, observability, reliability]
+transferable_languages: [python, go, typescript, node.js]
+prefer_domains: [saas, fintech, payments, search, observability, infrastructure, developer tools, cloud, data platform]
+avoid_terms: [wordpress, woocommerce, igaming, gambling, onsite, on-site, hybrid]
+culture_flags: [whatever it takes, grinders, ship uncomfortably fast, 10x, not counting hours, extreme ownership]
+strong_specialism_gaps: [spark, databricks, delta lake, deep learning, ml research]
+# Old applications are company-wide exclusions only when the exact job isn't known.
+# Existing applications do NOT exclude every future position at that company.
+submitted_companies: [Primer.io, Sensor Tower, Wingspan, Modash, Sezzle, Truv, CaptivateIQ, Solidgate, Sportradar, Elastic, Starburst, N-Ix, Aura, Valtech, Arista Networks, e.construct, RTB House, Akamai, NFQ, Coder, ClickHouse, Nuitée, Focal Systems, Capital.com, Constructor, Supabase, Field Materials]
+skipped_companies: [Nango, Affirm, Katalyst Alliance, Procuros, Prezly, EcoVadis, SkyCell, SANDIS, qlub, Box, Xentral, Clera, CoinsPaid, Xsolla, BnBerry, Reedsy, Redpanda, Fixly, Seerio, Bookinglayer, CloudDevs, Morgan, Plain, Piwik, Telemedi, Fresha, Rho, Backstory, Uncapped, Hostinger, Zoom, LeasingMarkt, think-cell, Surfshark, Ordio, KODANO, OTCF, Sirocco, BlueThrone, CKSource, Fitatu, Open Nexus, Jit Team, WhiteTech, Knapsack, Tidio, RemoDevs, Luxoft, Smart Working, Hospitable, Pleo, PayXpert, TravelLocal, Stape, HealthJoy, Seeking Alpha, Plentific, Oscilar, Bjak, Trading 212, Whatnot, Venn, Reap, Ziploy, Kalepa, SearchApi, Trigger.dev, Zerion, Apollo.io]

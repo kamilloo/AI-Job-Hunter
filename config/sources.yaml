@@ -1,0 +1,13 @@
+# EXAMPLES only. Replace with verified companies/boards of interest.
+# A board slug is not a universal search index: sources must be explicitly added.
+boards: []
+# e.g.:
+# - provider: greenhouse
+#   slug: acme
+#   company: Acme
+# - provider: ashby
+#   slug: acme
+#   company: Acme
+# - provider: lever
+#   slug: acme
+#   company: Acme

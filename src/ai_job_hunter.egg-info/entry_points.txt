@@ -1,0 +1,2 @@
+[console_scripts]
+job-hunter = job_hunter.cli:main

@@ -1,0 +1,776 @@
+JOB SEARCH OVERVIEW
+
+Last updated: 2026-10-19
+Location: Poland
+Primary work preference: Fully remote from Poland / EU / EEA / EMEA
+Preferred contract: B2B, but Polish UoP / EOR / international contractor can also be acceptable
+Availability: Immediately
+
+==================================================
+1. TARGET ROLES
+==================================================
+
+Primary target roles:
+- Senior PHP Developer
+- Senior Backend Engineer
+- Senior Software Engineer
+- Senior Product Engineer
+- Senior Platform Engineer
+- Senior Integration Engineer
+- Backend-focused Full-Stack Engineer
+
+Selective / transition roles:
+- Site Reliability Engineer
+- Platform Reliability Engineer
+- Engineering Productivity Engineer
+- Data-heavy Backend Engineer
+- Database Reliability Engineer
+- Forward Deployed / Solutions Engineer when the role remains strongly technical
+- AI / AI-platform engineering when strong software-engineering fundamentals are more important than years of production ML/LLM experience
+- Engineering Manager / Technical Lead only when the role remains hands-on enough
+
+==================================================
+2. CORE TECHNICAL PROFILE
+==================================================
+
+Experience:
+- 10+ years of professional software development
+- Strongest background: backend engineering
+- Main production language: PHP
+- Strong PHP frameworks: Laravel, Symfony, Yii / Yii2
+- Laravel was the first PHP framework used and is the preferred PHP framework
+
+Databases and data systems:
+- PostgreSQL
+- MySQL
+- Redis
+- Elasticsearch
+- SQL performance tuning
+- Query optimization
+- EXPLAIN ANALYZE
+- pgBadger
+- Large data migrations
+- Indexing
+- Data flow and production data reliability
+
+Backend and integration experience:
+- REST APIs
+- Third-party integrations
+- Payment integrations
+- Queues
+- Asynchronous processing
+- Webhooks / callbacks
+- Validation
+- Retry / timeout / failure handling
+- High-volume and data-heavy production systems
+
+Infrastructure / operations:
+- Docker
+- CI/CD
+- AWS / cloud environments
+- Monitoring / observability
+- New Relic
+- Uptime Kuma
+- Xdebug
+- Deployment automation
+- Production incident investigation
+- Reliability and performance troubleshooting
+
+AI-assisted engineering:
+- Daily use of Claude Code
+- Code understanding
+- Debugging
+- Code review
+- Test generation
+- Edge-case analysis
+- Validation
+- Reusable Claude Code skills / agents
+- Interested in AI-supported engineering, but does not want to pretend to have years of production RAG / ML / agent-platform experience
+
+==================================================
+3. STRONGEST ENGINEERING ACHIEVEMENTS
+==================================================
+
+1. PostgreSQL -> Elasticsearch migration
+- Led migration of application logs and more than 8 million cached profiles from PostgreSQL to Elasticsearch
+- Reduced load on the primary database
+- Improved response times
+- Worked on data structure, indexing, migration strategy, rollout safety, monitoring, and production performance
+
+2. Production reliability / debugging
+- Fixed more than 50 production issues
+- Examples:
+  - slow queries
+  - timeouts
+  - memory problems
+  - race conditions
+  - production reliability failures
+- Strong preference for root-cause analysis over temporary workarounds
+
+3. Payment integration
+- Built a public Laravel integration for Przelewy24
+- Repository:
+  https://github.com/devpark/laravel-przelewy24
+- Experience included:
+  - payment flows
+  - callbacks
+  - external API integration
+  - validation
+  - edge cases
+
+4. Public DevOps / infrastructure example
+- Repository:
+  https://github.com/kamilloo/kamilpietka-devops
+- Demonstrates organizing and deploying a personal portfolio with modern infrastructure / automation practices
+
+==================================================
+4. EDUCATION / ENGINEERING BACKGROUND
+==================================================
+
+Education:
+- Electronics and Telecommunications Engineering
+- Poznan University of Technology
+
+Important positioning:
+- Strong systems mindset rooted in electronics, telecommunications, networking, hardware, and communication systems
+- Career later moved deeply into software engineering
+- Useful narrative for infrastructure / platform / networking companies:
+  electronics + telecommunications -> backend engineering -> production reliability -> platform / data / infrastructure
+
+==================================================
+5. WORKING STYLE / ENGINEERING PREFERENCES
+==================================================
+
+Preferred engineering environment:
+- Sustainable pace
+- Strong engineering quality
+- Reliability and maintainability
+- Root-cause analysis
+- Thoughtful trade-offs
+- Stable teams
+- Long-term ownership
+- Product thinking
+- Low-meeting culture
+- Strong observability
+- Safe deployments
+- Good developer tooling
+- Engineering productivity
+- Learning and technical depth
+
+Positive work themes:
+- Data-heavy backend systems
+- Search / Elasticsearch
+- Observability
+- Platform engineering
+- Production reliability
+- High-volume APIs
+- Integrations
+- Payments / fintech
+- Distributed systems
+- Developer infrastructure
+- Cloud platforms
+- Streaming / queues
+- Database performance
+
+==================================================
+6. REMOTE / LOCATION CRITERIA
+==================================================
+
+Preferred:
+- Fully remote from Poland
+- Poland remote
+- EU / EEA / EMEA remote with Poland clearly supported
+- Genuine international remote
+
+Acceptable:
+- 1-2 company retreats per year
+- Occasional travel if not frequent
+- EOR / international contractor setup
+
+Avoid:
+- Recurring office attendance in Warsaw, Krakow, Gdansk, etc.
+- 2-3+ office days per week
+- Roles marked remote but application later requires hybrid attendance
+- Regular North American evening overlap
+- Daily Toronto / US-hours overlap such as 15:00-23:00
+
+Timezone:
+- Europe/Warsaw
+
+==================================================
+7. CONTRACT / COMPENSATION
+==================================================
+
+Preferred contract:
+- B2B
+
+Also acceptable:
+- Polish UoP
+- EOR
+- International contractor
+
+Preferred duration:
+- Long-term / open-ended
+
+Negative:
+- Short 3-6 month contracts unless compensation / role is exceptional
+
+Compensation guidance:
+- Rough minimum: ~22,000 PLN / month
+- Preferred B2B: ~25,000-30,000 PLN net + VAT / month
+- Rough hourly floor: >140 PLN / hour
+
+Recent salary expectations used in applications:
+- €6,500 / month B2B
+- €7,000+ / month where role supports it
+- €85,000 / year
+- €90,000 / year
+- $7,500 / month
+- $50-$55 / hour
+- 360,000 PLN / year
+
+Compensation should depend on:
+- role scope
+- contract type
+- late-hours requirement
+- short contract duration
+- technology transition risk
+- seniority and ownership level
+
+==================================================
+8. COMPANY PREFERENCES
+==================================================
+
+Strong preference:
+- Direct product company
+- Own SaaS / platform / infrastructure product
+- Established or credible product business
+- Larger / well-funded / profitable companies increasingly preferred
+- Data-heavy or infrastructure-heavy companies are especially attractive
+
+Preferred domains:
+- SaaS
+- Fintech
+- Payments
+- Insurtech
+- Marketplaces
+- E-commerce platforms
+- Travel / hospitality tech
+- Developer tools
+- Search
+- Observability
+- Infrastructure
+- Cybersecurity
+- Integrations
+- Education
+- Document / e-signature platforms
+- Data products
+- Cloud / networking
+
+Can be considered selectively:
+- Consultancy
+- Engineering services
+- Staff augmentation
+
+Important condition:
+- Must flag when the company is a consultancy / services / client-project business
+
+Avoid or deprioritize:
+- Hidden-partner / anonymous client roles
+- Recruiter-only / intermediary listings
+- Generic outsourcing
+- Unclear small companies with weak credibility
+- Aggressive ad-tech
+- Gambling / iGaming
+- WordPress / WooCommerce / CMS-heavy roles
+
+==================================================
+9. TECHNOLOGY LIMITATIONS / TRANSITION RULES
+==================================================
+
+Strongest stack:
+- PHP
+- Laravel
+- Symfony
+- Yii / Yii2
+- PostgreSQL
+- MySQL
+- Redis
+- Elasticsearch
+- REST APIs
+- Docker
+- AWS
+- CI/CD
+
+Can transition into:
+- TypeScript / Node.js when backend fundamentals are valued more than years of Node-specific experience
+- Go when the company accepts strong backend / systems engineers from other languages
+- Python when the role is systems / integration / reliability oriented and does not require years of production Python specialization
+- SRE / platform when software-engineering background is valued
+- Data engineering when the role values SQL, systems, reliability, and cloud fundamentals rather than demanding deep Spark / Databricks specialization
+
+Avoid when hard requirement:
+- Deep Java / Spring specialist
+- .NET / C#
+- Specialist Go with years of production Go required
+- Specialist Python / data engineering
+- Spark / Databricks / Delta Lake expert
+- Ruby-heavy roles unless the role explicitly accepts transferable experience
+- Frontend-first React roles
+- ML / Data Scientist roles
+- Deep RAG / AI agent framework specialization required from day one
+
+==================================================
+10. AWS / DATA ENGINEERING POSITIONING
+==================================================
+
+AWS familiarity:
+- S3
+- Glue
+- EMR
+- Redshift
+- Kinesis
+- Lambda
+
+Important accuracy note:
+- These AWS data services were presented / demonstrated to students in teaching sessions
+- Do not describe them as years of deep production ownership unless true
+
+Data engineering:
+- Around 3 years of hands-on data-intensive engineering work
+- Around 1-2 years involving cloud-based environments
+- Strongest real experience:
+  - large data migrations
+  - PostgreSQL
+  - Elasticsearch
+  - data processing
+  - performance
+  - reliability
+
+Spark / Delta Lake / Databricks:
+- No significant production experience yet
+- Be transparent
+- Position as a deliberate transition area
+
+==================================================
+11. LANGUAGE
+==================================================
+
+English:
+- B2 / upper-intermediate
+- Comfortable in technical interviews
+- Professional working English
+
+Caution:
+- Roles requiring C1 may still be possible but are less ideal
+- Roles requiring native / near-native / perfect English should usually be skipped
+
+German:
+- Willing to improve
+
+==================================================
+12. CULTURE FILTERS
+==================================================
+
+Positive language:
+- reliability
+- maintainability
+- thoughtful trade-offs
+- sustainable engineering
+- long-term improvements
+- pragmatic engineering
+- deep work
+- quality
+- learning
+- stable teams
+- developer productivity
+
+Negative / caution language:
+- "10x"
+- "5x output"
+- "whatever it takes"
+- "extreme ownership"
+- "high velocity"
+- "move insanely fast"
+- "always be shipping"
+- "drivers not passengers"
+- "all in"
+- "obsessed"
+- "grinders"
+- "hustle"
+- "not counting hours"
+- frequent late-night / weekend work
+- "ship uncomfortably fast"
+
+These are not automatic rejects in every case, but should be treated as strong caution signals.
+
+==================================================
+13. FRESHNESS / SEARCH RULES
+==================================================
+
+Very strict:
+- Official company careers page or official ATS first
+- Working apply endpoint required
+- If official page says:
+  - position closed
+  - not available
+  - no longer accepting
+  - 404
+  - application disabled
+  then treat as stale / skip
+
+Do NOT trust:
+- LinkedIn alone
+- aggregators alone
+- indexed Ashby / Lever pages that are no longer present on company careers page
+
+Important:
+- Several stale jobs were caught manually by checking the real company careers page
+- Freshness verification must be done before recommending
+
+==================================================
+14. APPLICATION STYLE
+==================================================
+
+Preferred style:
+- concise
+- factual
+- natural
+- personal
+- engineering-focused
+- no exaggerated claims
+
+Good themes:
+- production debugging
+- reliability
+- performance
+- integrations
+- PostgreSQL / Elasticsearch
+- safe migrations
+- observability
+- end-to-end ownership
+- AI-assisted engineering
+- systems thinking
+- long-term product quality
+
+Avoid:
+- overselling AI experience
+- pretending to be specialist in a new stack
+- claiming management experience not supported by facts
+- inflating English proficiency
+- generic corporate language
+
+==================================================
+15. SENT / SUBMITTED APPLICATIONS
+==================================================
+
+Recent / active submitted applications include:
+
+- Primer.io — Senior Engineer, Backend Orchestration
+- Sensor Tower — Platform Engineer
+- Wingspan — Software Engineer, Payment Operations
+- Modash — Senior Backend Engineer, Data Core
+- Sezzle
+- Truv
+- CaptivateIQ — Fullstack Software Engineer, Poland
+- Solidgate — Backend / Billing
+- Sportradar — Software Developer, Go or PHP
+- Elastic — Senior Site Reliability Engineer, Platform Reliability
+- Starburst
+- N-Ix — PHP Leader
+- Aura — Senior Software Engineer, AI Intelligence Platform
+- Valtech — Senior Data Engineer
+- Arista Networks — Senior Software Engineer, Engineering Productivity
+- e.construct / VAES — Senior Software Engineer
+- RTB House
+- Akamai — Senior Software Engineer, Data Engineering
+- NFQ / HomeToGo — Senior Software Engineer, PHP
+- Coder — Software Engineer, Enterprise Experience (Backend)
+- ClickHouse — Software Engineer, Core / ClickPipes application path handled
+- Nuitée — Senior Backend Engineer
+- Focal Systems — Senior Customer Integration Engineer
+- Capital.com — Senior Database Reliability Engineer
+- Constructor — Software Engineer: Core
+- Supabase
+- Field Materials
+
+Handled / submitted status should be respected:
+- Do not resurface the same role
+- Only resurface the same company if there is a materially different, newly live role
+
+==================================================
+16. EXPLICITLY SKIPPED / CLOSED / STALE ROLES OR COMPANIES
+==================================================
+
+Do not resurface unless something materially changes:
+
+- Nango
+- Affirm
+- Katalyst Alliance
+- Procuros
+- Prezly
+- EcoVadis
+- SkyCell
+- SANDIS
+- qlub
+- Box
+- Xentral
+- Clera
+- CoinsPaid
+- Xsolla
+- BnBerry
+- Reedsy
+- Redpanda
+- Fixly
+- Seerio
+- Bookinglayer
+- CloudDevs
+- Morgan
+- Plain
+- Piwik
+- Telemedi
+- Fresha
+- Rho
+- Backstory
+- Uncapped
+- Hostinger AI Builder
+- Zoom / Workvivo
+- LeasingMarkt
+- think-cell
+- Surfshark
+- Ordio
+- KODANO
+- OTCF
+- Sirocco
+- BlueThrone
+- CKSource
+- Fitatu
+- Open Nexus
+- Jit Team
+- WhiteTech
+- Knapsack
+- Tidio
+- RemoDevs
+- Luxoft
+- Smart Working
+- Hospitable
+- Pleo
+- vonRoll Infratec
+- PayXpert
+- TravelLocal
+- bTrive
+- Stape
+- HealthJoy
+- Seeking Alpha
+- Plentific
+- Confluent current specialist roles
+- Datadog current non-Poland-remote roles
+- Grafana current non-Poland-remote roles
+- Netflix Data Platform Poland onsite
+- Oscilar
+- Bjak
+- Trading 212
+- Whatnot
+- Venn
+- GitLab roles with hard agentic-AI specialization
+- payabl Python specialist roles
+- Backstory / People.ai data specialist roles
+- Reap
+- Ziploy
+- Deel where language expectations are too high
+- Kestra AI Orchestration — stale / not on current careers page
+- Lago Forward Deployed Engineer — expired
+- Lago Senior Backend Engineer — expired
+- Searchandizing role at Constructor — expired
+- Kalepa due "whatever it takes" / >40h culture
+- SearchApi due grinders / move-fast / late-night operational risk
+- Trigger.dev due "ship uncomfortably fast"
+- Zerion due Web3 + fast-paced culture
+- Apollo.io due extreme ownership / urgency / frontend-growth focus
+
+==================================================
+17. CURRENT OBSTACLES / RISKS
+==================================================
+
+1. Language mismatch
+Many attractive infrastructure / platform roles are Go, Python, Java, or TypeScript-first.
+
+Mitigation:
+- Target roles that explicitly accept strong engineers from other languages
+- Emphasize backend fundamentals, data systems, reliability, and production ownership
+- Be transparent about language transition
+
+2. Dedicated SRE / DBA requirements
+Some database reliability / platform roles require 5-7+ years specifically in DBA / SRE.
+
+Mitigation:
+- Position as senior backend engineer with strong real production reliability and database performance experience
+- Do not claim dedicated DBA history
+
+3. Data engineering stack gap
+Some roles require Spark, Databricks, Delta Lake, deep Python.
+
+Mitigation:
+- Apply only when they value transferable systems / SQL / cloud knowledge
+- Be transparent about the gap
+- Use real AWS teaching / presentation experience accurately
+
+4. Frontend-heavy roles
+Many "full-stack" roles are actually React-first.
+
+Mitigation:
+- Prefer backend-leaning full-stack
+- Avoid roles where React is clearly the main specialization
+
+5. AI specialization inflation
+Many current roles expect years of agentic AI / RAG / ML platform experience.
+
+Mitigation:
+- Emphasize daily Claude Code use and reusable AI engineering workflows
+- Do not present this as equivalent to production AI platform ownership
+
+6. Consultancy / intermediary risk
+Many technically good PHP jobs are through agencies / outsourcing companies.
+
+Mitigation:
+- Prefer product companies
+- Consider consultancy selectively when technical fit is exceptional
+- Always flag client-project risk
+
+7. Remote ambiguity
+Some jobs say remote but later ask for office attendance.
+
+Mitigation:
+- Check application form and official location wording
+- Treat hybrid requirement as material concern
+
+8. Culture mismatch
+Some companies explicitly reward extreme pace / long hours / constant shipping.
+
+Mitigation:
+- Scan values and application wording carefully
+- Prefer reliability, maintainability, and long-term quality over speed-at-all-costs
+
+9. Stale job pages
+Several roles remained indexed after closing.
+
+Mitigation:
+- Always verify official careers page and working apply endpoint
+
+==================================================
+18. MAIN BENEFITS / DIFFERENTIATORS
+==================================================
+
+1. Seniority and breadth
+- 10+ years professional engineering
+- Strong backend foundation
+- Comfortable across application, database, integration, and production concerns
+
+2. Production debugging
+- More than 50 real production issues fixed
+- Strong root-cause mindset
+- Experience across slow queries, memory, timeouts, race conditions, and reliability
+
+3. Data-heavy systems
+- Led migration of 8M+ cached profiles and logs from PostgreSQL to Elasticsearch
+- Strong practical understanding of indexing, data flow, database load, and production performance
+
+4. Search / Elasticsearch
+- Valuable differentiator for search, observability, data, and high-volume backend companies
+
+5. Database experience
+- PostgreSQL and MySQL
+- Query optimization
+- EXPLAIN ANALYZE
+- pgBadger
+- Performance and migration experience
+
+6. Integrations
+- Strong API and third-party integration background
+- Public Przelewy24 payment integration
+- Useful for fintech, billing, travel, SaaS integrations, and forward-deployed roles
+
+7. Reliability mindset
+- Production ownership
+- Monitoring
+- Safe rollouts
+- Root-cause investigation
+- Strong fit for SRE / platform transitions
+
+8. Systems thinking
+- Electronics and Telecommunications Engineering background
+- Useful for networking, infrastructure, cloud, and distributed systems companies
+
+9. AI-assisted engineering
+- Daily Claude Code user
+- Practical and grounded use
+- Reusable skills / agents
+- Strong fit for companies that expect engineers to use modern AI tools without needing ML-research specialization
+
+10. Open source / public work
+- Przelewy24 Laravel integration
+- Public DevOps repository
+- Gives employers concrete code / engineering examples
+
+==================================================
+19. BEST SEARCH POSITIONING
+==================================================
+
+The strongest market positioning is NOT:
+
+"Senior PHP Developer"
+
+The strongest positioning is closer to:
+
+"Senior backend engineer with 10+ years of experience in PHP, PostgreSQL, Elasticsearch, integrations, production reliability, data-heavy systems, and performance troubleshooting."
+
+Or for platform-oriented roles:
+
+"Senior backend / production engineer transitioning toward platform and reliability engineering, with strong PostgreSQL, Elasticsearch, observability, integrations, CI/CD, and incident-debugging experience."
+
+Or for data-heavy roles:
+
+"Senior backend engineer with strong SQL, Elasticsearch, migration, performance, reliability, and large-scale data experience."
+
+==================================================
+20. SEARCH PRIORITIES GOING FORWARD
+==================================================
+
+Highest priority:
+- Product companies
+- Poland remote
+- EU / EMEA remote
+- Backend
+- Platform
+- Reliability
+- Search
+- Observability
+- Data-serving systems
+- PostgreSQL-heavy SaaS
+- Elasticsearch-heavy products
+- Payments / fintech
+- Billing platforms
+- Integration platforms
+- Developer infrastructure
+- Cloud / networking
+- High-volume APIs
+
+Good company categories to continue monitoring:
+- Search infrastructure
+- Observability platforms
+- Data platforms
+- Streaming infrastructure
+- Developer tooling
+- Fintech infrastructure
+- Payment platforms
+- Cybersecurity
+- High-volume SaaS
+- Cloud platforms
+- Networking
+- Databases
+- Infrastructure automation
+
+Search philosophy:
+- Prefer roles where underlying engineering problems match existing experience
+- Accept language transition when employer explicitly values transferable backend / systems experience
+- Avoid forcing applications into specialist stacks with hard experience requirements
