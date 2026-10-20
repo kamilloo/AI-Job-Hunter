@@ -1,0 +1,78 @@
+
+[
+  {
+    "id": "E01",
+    "type": "real_snapshot",
+    "job": {
+      "provider": "greenhouse",
+      "board": "algolia",
+      "external_id": "6200281004",
+      "company": "Algolia",
+      "title": "Senior Site Reliability Engineer, AI Platform",
+      "location": "Paris, France",
+      "description": "PASTE THE ACTUAL JOB DESCRIPTION HERE",
+      "url": "https://job-boards.greenhouse.io/algolia/jobs/6200281004",
+      "apply_url": "https://job-boards.greenhouse.io/algolia/jobs/6200281004",
+      "remote": null,
+      "verified_live": true
+    },
+    "remote_policy": "Poland remote eligibility is not established from the evidence currently recorded.",
+    "candidate_requirements": [
+      "Site reliability engineering",
+      "AWS and cloud infrastructure",
+      "Observability",
+      "AI platform infrastructure"
+    ],
+    "expected_eligibility": "review",
+    "explanation": "ATS detail was verified, but the recorded evidence does not establish remote eligibility from Poland. Rejection requires explicit exclusion evidence or another confirmed hard restriction."
+  },
+  {
+    "id": "E02",
+    "type": "synthetic",
+    "job": {
+      "provider": "fixture",
+      "board": "example",
+      "external_id": "E02",
+      "company": "Example Backend SaaS",
+      "title": "Senior Backend Engineer",
+      "location": "Remote - Poland",
+      "description": "Fully remote from Poland. Senior backend role using PHP, Laravel, PostgreSQL, Redis, REST APIs and Docker. Long-term product engineering.",
+      "url": "https://example.com/jobs/E02",
+      "remote": true,
+      "verified_live": true
+    },
+    "remote_policy": "Fully remote from Poland",
+    "candidate_requirements": [
+      "PHP and Laravel",
+      "PostgreSQL",
+      "REST APIs",
+      "Docker"
+    ],
+    "expected_eligibility": "eligible",
+    "explanation": "Poland remote is explicitly supported, ATS status is simulated as verified, and the position matches core backend skills."
+  },
+  {
+    "id": "E03",
+    "type": "synthetic",
+    "job": {
+      "provider": "fixture",
+      "board": "example",
+      "external_id": "E03",
+      "company": "Example AI Infrastructure",
+      "title": "Senior Platform Engineer",
+      "location": "Remote - France only",
+      "description": "Remote work is restricted to residents of France. We require experience with AWS, Kubernetes, observability and AI infrastructure.",
+      "url": "https://example.com/jobs/E03",
+      "remote": true,
+      "verified_live": true
+    },
+    "remote_policy": "France residents only",
+    "candidate_requirements": [
+      "AWS",
+      "Kubernetes",
+      "Observability"
+    ],
+    "expected_eligibility": "rejected",
+    "explanation": "The job explicitly restricts employment to France. Strong technical fit cannot override location ineligibility."
+  }
+]
