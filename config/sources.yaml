@@ -1,6 +1,9 @@
 # EXAMPLES only. Replace with verified companies/boards of interest.
 # A board slug is not a universal search index: sources must be explicitly added.
-boards: []
+boards:
+  - provider: greenhouse
+    slug: algolia
+    company: Algolia
 # e.g.:
 # - provider: greenhouse
 #   slug: acme

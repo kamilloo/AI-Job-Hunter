@@ -100,16 +100,18 @@ async def run(args):
     print(f"Wrote {args.output}; {len(items)} results, {len(errors)} warnings")
 
 def main():
+    from dotenv import load_dotenv
+    load_dotenv()
     parser = argparse.ArgumentParser(description='Daily AI Job Hunter')
     parser.add_argument('--profile', default=str(ROOT/'config/profile.yaml'))
     parser.add_argument('--sources', default=str(ROOT/'config/sources.yaml'))
     parser.add_argument('--database', default='jobs.sqlite3')
     parser.add_argument('--output', default='reports/daily.md')
     parser.add_argument('--ai', action='store_true', help='Enable OpenAI Agents SDK analysis')
-    parser.add_argument('--model', default=os.getenv('OPENAI_MODEL', 'gpt-4.1-mini'))
+    parser.add_argument('--model', default=os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite') if os.getenv('GEMINI_API_KEY') else os.getenv('OPENAI_MODEL', 'gpt-4.1-mini'))
     args = parser.parse_args()
-    if args.ai and not os.getenv('OPENAI_API_KEY'):
-        parser.error('--ai requires OPENAI_API_KEY and pip install -e ".[ai]"')
+    if args.ai and not (os.getenv('GEMINI_API_KEY') or os.getenv('OPENAI_API_KEY')):
+        parser.error('--ai requires GEMINI_API_KEY or OPENAI_API_KEY and pip install -e ".[ai]"')
     asyncio.run(run(args))
 
 if __name__ == '__main__': main()

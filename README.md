@@ -60,3 +60,17 @@ python -c "import sqlite3; c=sqlite3.connect('jobs.sqlite3'); c.execute('update 
 - Greenhouse public Job Board API: https://docs.greenhouse.io/job-board
 - Ashby public postings API: https://developers.ashbyhq.com/docs/public-job-posting-api
 - Lever Postings API: https://github.com/lever/postings-api
+
+## Using Google Gemini instead of OpenAI
+
+The AI evaluator also works with Gemini through Google's OpenAI-compatible Chat Completions endpoint.
+
+```bash
+export GEMINI_API_KEY="your-key"
+export GEMINI_MODEL="gemini-3.5-flash-lite"
+job-hunter --ai --output reports/daily-gemini.md
+```
+
+You can instead use `--model gemini-3.5-flash-lite`. When `GEMINI_API_KEY` is set, it takes priority over the OpenAI provider. The agent uses `OpenAIChatCompletionsModel` and disables OpenAI tracing. You still need an active ATS source and an eligible/review job for a model request to happen.
+
+Note: Gemini's OpenAI compatibility layer is beta and structured output support may vary by model. Run with a real job to validate this path; a zero-job report does not prove AI integration works.

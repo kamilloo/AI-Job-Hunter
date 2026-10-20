@@ -6,6 +6,18 @@ class Eligibility(str, Enum):
     review = "review"
     rejected = "rejected"
 
+class JobAnalysis(BaseModel):
+    reasons: list[str]
+    concerns: list[str]
+
+    ai_transition_score: int = Field(ge=0, le=100)
+
+    location_eligibility: Eligibility
+    location_evidence: str
+
+    recommendation: str
+
+
 class Job(BaseModel):
     provider: str
     board: str
@@ -34,3 +46,10 @@ class Match(BaseModel):
     concerns: list[str] = Field(default_factory=list)
     evidence: list[str] = Field(default_factory=list)
     ai_analyzed: bool = False
+
+class JobHunter(BaseModel):
+    job: Job
+    eligibility: Eligibility
+    match: Match
+
+
