@@ -248,29 +248,6 @@
   {
     "id": "E10",
     "type": "historical_application",
-    "job": {
-      "provider": "greenhouse",
-      "board": "EXACT_BOARD",
-      "external_id": "EXACT_JOB_ID",
-      "company": "Example Company",
-      "title": "Senior Backend Engineer",
-      "location": "Remote - Poland",
-      "description": "ORIGINAL_JOB_DESCRIPTION",
-      "url": "https://example.com/original-job"
-    },
-    "application_status": "applied",
-    "expected_eligibility": "eligible",
-    "expected_fit": "strong",
-    "label_evidence": [
-      "Remote work from Poland explicitly supported",
-      "Core backend engineering skills match",
-      "No confirmed hard restrictions"
-    ],
-    "explanation": "Historically applied and independently verified as a strong match."
-  },
-  {
-    "id": "E10",
-    "type": "historical_application",
     "snapshot_origin": "reconstructed_from_official_careers_posting",
     "snapshot_date": "2026-10-22",
     "user_decision": "applied",

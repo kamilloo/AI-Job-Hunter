@@ -52,4 +52,11 @@ class JobHunter(BaseModel):
     eligibility: Eligibility
     match: Match
 
+class EligibilityFactors(BaseModel):
+    location: Eligibility = Eligibility.review
+    remote: Eligibility = Eligibility.review
+    technical: Eligibility = Eligibility.review
+    compensation: Eligibility = Eligibility.review
+    ats: Eligibility = Eligibility.review
+
 
