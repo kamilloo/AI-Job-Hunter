@@ -184,6 +184,219 @@
     ],
     "expected_eligibility": "review",
     "explanation": "Poland-base B2B contracting is supported, and the role offers relavant AI integration, AWS, and production engineering experience. However, strong production python/FastAPI skills are required, while the candidate's strongest expeience is PHP. The advertised 90-120 PLN/hour rate is below the candidate's approximate hourly floor of over 140 PLN. Fully conditions should also be confirmed."
+  },
+  {
+    "id": "E08",
+    "type": "real_snapshot",
+    "job": {
+      "provider": "greenhouse",
+      "board": "ingenious",
+      "external_id": "4674044005",
+      "company": "INGENIOUS.BUILD",
+      "title": "Developer Team Lead",
+      "location": "Poland - Remote",
+      "description": "At INGENIOUS.BUILD, we have developed a top-notch platform for companies in the real estate and construction industries worldwide. Our platform enables companies to easily manage all aspects of their projects from start to finish, both internally and with other project participants. \n\nJoining INGENIOUS.BUILD means embarking on an incredible journey to create the first cloud application for managing the entire lifecycle of a real estate construction project. You'll be building what some consider the holy grail of construction project management. It's a big, bold, and audacious endeavor, and if you have what it takes, you'll play a direct role in its development. \n\nAnd if you’ve got what it takes, you’ll be directly involved in its development. The rest, as they say, will be history...\n\nINGENIOUS.BUILD is building the operating system for construction and real estate development. We work with some of the largest organizations in the world, and the features our engineers build help teams manage some of the biggest investments being made today. If we succeed, a large share of the world's important infrastructure will be planned, built, and reported on through our platform.\n\nWe're a product-driven engineering organization. Engineers here don't just take tickets. They understand the customer, challenge proposed solutions, and shape what gets built. We're also going all-in on AI. We treat it as a way to deliver more value to customers, not just to write code faster.\n\nAbout the role\nWe're looking for a Developer Team Lead to lead one of our web product teams. This is a small, senior, highly autonomous team. You won't be supervising juniors. You'll be a partner to experienced engineers: bringing the team together, building the right processes, and keeping the team efficient, aligned, and focused on the right problems.\n\nThe role combines hands-on engineering and leadership. You'll write code, make architectural decisions, and lead the team's AI adoption, while also owning people management, planning, and prioritization. You'll report directly to the Engineering Director. You'll work closely with a Product Manager and a dedicated Product Designer, and alongside other team leads and our DevOps team.\n\nWhat you'll do\nLead the team\n\nRun regular 1:1s, monitor performance, and support each engineer's growth, including compensation and career conversations.\nOwn the team's high-level planning and prioritization, together with Product and Design.\nBuild and improve the processes that keep a senior team synchronized and effective, without adding bureaucracy.\nTake part in hiring, onboarding, and performance reviews.\n \n\nDrive AI adoption\n\nLead the AI transformation in your team. Set the pace instead of waiting for it to be defined for you.\nGo beyond basic prompting. Use AI to research unfamiliar systems, identify gaps, automate repetitive work, and speed up delivery.\nExperiment with new tools and workflows, standardize what works, and share it with your team and across engineering.\nLook for ways AI can deliver business value: lower costs, shorter delivery times, higher quality, and solutions that weren't practical before.\nBuild the product\n\nStay hands-on: write code, review code, and own the technical direction of your team's modules.\nMake sound architectural decisions in a large modular monolith.\nUse customer insights to challenge solutions, propose improvements, and help decide what to build and in what order.\nKeep improving the codebase by reducing legacy code, adding tests, and keeping dependencies current.\nOur tech and engineering approach\nStack: PHP 8.5, Laravel 13, PostgreSQL\nArchitecture: a large modular monolith. Modules communicate through facades, adapters, or events, which keeps boundaries clear. More complex modules use DDD.\nPhilosophy: code that's easy to test and reason about. Business logic lives in clear PHP classes, separate from the framework, with no \"magic.\"\nQuality: pipelines with PHPStan, PHPCS, and unit, integration, and end-to-end tests, all supporting automatic deployments. DevOps owns infrastructure, so you can focus on building.\nAI tooling: Claude Code, GitHub Copilot, and whatever else helps us move faster. We revisit our tools regularly because they improve quickly.\nWhat we're looking for\nMust-haves\n\nPeople management experience. You've already led developers, including 1:1s, performance, and team processes. This isn't a first step into management.\nStrong backend engineering. Advanced PHP 8.1+ with Laravel or Symfony, and experience building large, scalable applications.\nTechnical leadership and architecture. You've led the technical side of complex projects: making design decisions, not just carrying them out.\nHands-on AI adoption. You already use AI tools in your daily engineering work and are excited to push further. You don't need deep AI expertise, but you do need the energy to lead this.\nProduct mindset. You care about the \"why,\" think about business impact, and want to shape solutions, not just implement specs.\nTesting. Solid experience with PHPUnit and a good testing strategy across unit, integration, and functional tests.\nEnglish at B2 level or higher.\nNice-to-haves\n\nExperience with modular monoliths (microservices experience also counts)\nPractical experience with Domain-Driven Design\nBackground in SaaS, especially large systems like ERP, CRM, or CMS\nExperience in startups or scale-ups where engineers work directly with product decisions\nThe kind of person who thrives here\n\nCurious. You enjoy learning, and you revisit your opinions as tools and practices change.\nProactive. You spot problems and opportunities and act on them. You can point to improvements you proposed that were adopted.\nDriven. You have the grit to take on hard problems and want to be part of something that could reshape an industry.\nA partner. Senior engineers respect you because you support them, not because you manage them closely.\nWhat we offer\nStock options, so you share in the company's growth\nFlexible working hours and a minimal-meetings culture\nUnlimited PTO\nA high-performance company laptop\nOne-time $500 budget to set up your workspace\n$50 per month for education, rolling over until year-end\nLicenses for Claude Code, GitHub Copilot, and PhpStorm\nWe're fired up to learn more about you to see how you can help us on our mission! \n\nWe genuinely look forward to receiving your application after submitting your information a member from the Recruitment Team will reach out accordingly. ",
+      "url": "https://job-boards.greenhouse.io/ingenious/jobs/4674044005",
+      "remote": true,
+      "verified_live": true,
+      "verified_at": "2026-10-21"
+    },
+  "expected_eligibility": "review",
+  "remote_policy": "Official location: Poland - Remote. The application form confirms residence in Poland or a nearby country with travel to Poland offsites as needed.",
+  "candidate_requirements": [
+    "Previous people management experience including 1:1s and performance reviews",
+    "Advanced PHP with Laravel or Symfony",
+    "Technical leadership and architectural decisions",
+    "Hands-on AI adoption",
+    "PHPUnit and automated testing",
+    "Product thinking",
+    "English B2 or higher"
+  ],
+  "explanation": "The remote location and technical stack align strongly with the candidate, and the role offers practical AI adoption opportunities. However, prior formal people-management experience is an explicit must-have and is not established by the candidate profile. Manual assessment is required before recommending this leadership role."
+},
+  {
+    "id": "E09",
+    "type": "real_snapshot",
+    "job": {
+      "provider": "greenhouse",
+      "board": "starburst",
+      "external_id": "5429073008",
+      "company": "Starburst",
+      "title": "Senior Software Engineer, Context Layer",
+      "location": "Warsaw, Poland",
+      "description": "About Starburst\nStarburst delivers enterprise intelligence at scale by giving organizations secure, governed access to all their data, wherever it lives. Built for distributed data environments, Starburst helps enterprises power AI and analytics without the cost and complexity of traditional data consolidation. With open standards including Trino and Apache Iceberg, Starburst enables trusted access to complete enterprise context while helping organizations avoid vendor lock-in. Leading global enterprises trust Starburst to fuel AI, analytics, and enterprise intelligence. Learn more at starburst.ai.\n\nAbout the role\n\nStarburst's Enterprise Context Layer turns scattered data into governed, versioned Data Products — business definitions, access policy, and lineage built in — so BI tools, applications, and AI agents all work from the same trusted answer. As a Senior Software Engineer on this team, you'll build the backend services that harvest business context from where it already lives, govern it through a certification and versioning workflow, and serve it to both people and AI agents across the platform. This is a fast-evolving product area, so you'll have real influence over foundational architecture decisions rather than executing against a fully-specified spec. We're looking for builders with strong product instincts — engineers who care as much about the customer outcome as the technical solution, and who are comfortable moving across the stack when that's the fastest path to shipping value, even though the core of this role is Java-based backend work.\n\nAs a Senior Software Engineer at Starburst you will:\n\nDesign, build, and operate backend services that collect and reconcile business context from a variety of existing systems into governed Context Studio.\nBuild and evolve the certification and versioning workflow that lets teams trust a single definition of their metrics and data.\nContribute to the APIs and MCP-based integrations that let AI agents and BI tools query certified context directly.\nOwn reliability and data consistency for services that merge and reconcile information from many sources at once.\nPartner directly with product on what gets built, not just how — and pick up frontend, tooling, or other full-stack work when it's the fastest way to unblock a feature or validate an idea.\nWork cross-functionally with teams across the platform, including those building AI-powered features, to ship context-aware capabilities.\nProvide considerate, timely review of your peers' pull requests and design proposals.\nSome of the things we look for:\n\nA builder's mindset with strong product thinking — you care about the \"why\" behind a feature, not just the elegance of the implementation.\nExtensive software development experience with Java, with the versatility and willingness to work across the full stack — frontend, tooling, infra — when the problem calls for it.\nExperience designing, building, and operating distributed backend services in production.\nExperience designing and operating REST APIs.\nExperience modeling and serving graph-structured or richly-relational data \nExperience integrating LLMs into backend systems — structured extraction, prompt-based enrichment, or evaluating LLM output for correctness — relevant to how we help harvest and enrich context.\nComfort working in ambiguous, fast-evolving problem spaces where architecture is still being defined.\nHands-on experience using agentic coding tools in real production work, with the judgment to apply proper guardrails — testing, review, verification steps — so speed doesn't come at the cost of code quality or correctness.\nDemonstrated experience with software engineering best practices.\nBonus: experience with data catalogs, semantic layers, or metadata/governance systems (e.g., dbt, Collibra) is a plus, not required.\nAbility to Travel: This role will require 25% in-person travel for purposes including but not limited to new hire onboarding, team and department offsites, customer engagements, and other company events. Actual travel expectations may vary by role and business needs.\nWhere could this role be based?\n\nThis role is based in our Warsaw office and follows a hybrid model, with an expectation of being onsite 1-2 days per week.\nBuild your career at Starburst\nAll-Stars have the opportunity and freedom to realize their true potential. By building alongside top talent, we’re empowered to take ownership of our careers and drive meaningful change. Anchored in industry-proven technology and unprecedented success, All-Stars are taking on the challenge everyday to disrupt our industry –  and the future. \n\nOur global workforce is supported by a competitive Total Rewards program that reflects our commitment to a rewarding and supportive work environment. This includes a variety of benefits like competitive pay, attractive stock grants, flexible paid time off, and more. \n\nWe are committed to fostering an intentional, inclusive, and diverse culture that drives deep engagement, authentic belonging, and an exceptional All-Star experience. We believe that diversity of thought, perspective, background and experience will enable us to own what we do, drive our success and empower our All-Stars to show up authentically.\n\nStarburst provides equal employment opportunities to all employees and applicants for employment and prohibits discrimination and harassment of any type without regard to race, color, religion, age, sex, national origin, disability status, genetics, protected veteran status, sexual orientation, gender identity or expression, or any other characteristic protected by federal, state\n or local laws.",
+      "url": "https://job-boards.greenhouse.io/starburst/jobs/5429073008",
+      "remote": false,
+      "verified_live": true,
+      "verified_at": "2026-10-21"
+    },
+  "expected_eligibility": "rejected",
+  "remote_policy": "Warsaw-based hybrid role requiring 1-2 office days per week. The role also requires approximately 25% in-person travel.",
+  "candidate_requirements": [
+    "Extensive software development experience with Java",
+    "Distributed backend services",
+    "REST API development",
+    "Graph-structured or richly relational data",
+    "LLM integration into backend systems",
+    "MCP-based integrations",
+    "Production reliability and data consistency",
+    "Experience with agentic coding tools",
+    "Willingness to travel approximately 25%"
+  ],
+  "explanation": "The role offers valuable AI engineering opportunities through LLM integrations, MCP and context-serving backend systems. However, mandatory Warsaw office attendance of 1-2 days per week conflicts with the candidate's fully remote requirement. The 25% travel expectation and extensive production Java requirement are additional mismatches. The position must be rejected regardless of its AI transition score."
+  },
+  {
+    "id": "E10",
+    "type": "historical_application",
+    "job": {
+      "provider": "greenhouse",
+      "board": "EXACT_BOARD",
+      "external_id": "EXACT_JOB_ID",
+      "company": "Example Company",
+      "title": "Senior Backend Engineer",
+      "location": "Remote - Poland",
+      "description": "ORIGINAL_JOB_DESCRIPTION",
+      "url": "https://example.com/original-job"
+    },
+    "application_status": "applied",
+    "expected_eligibility": "eligible",
+    "expected_fit": "strong",
+    "label_evidence": [
+      "Remote work from Poland explicitly supported",
+      "Core backend engineering skills match",
+      "No confirmed hard restrictions"
+    ],
+    "explanation": "Historically applied and independently verified as a strong match."
+  },
+  {
+    "id": "E10",
+    "type": "historical_application",
+    "snapshot_origin": "reconstructed_from_official_careers_posting",
+    "snapshot_date": "2026-10-22",
+    "user_decision": "applied",
+    "job": {
+      "provider": "company_careers",
+      "board": "solidgate",
+      "external_id": "34fee32d-2a5a-4709-b31f-b3b0219dcdc4",
+      "company": "Solidgate",
+      "title": "Backend Engineer (Billing)",
+      "location": "Europe; Remote; Warsaw; Kyiv; Lviv",
+      "description": "Billing engineering team developing subscription and invoicing infrastructure. Build Products & Prices domain model and public APIs; high-precision enterprise pricing; reliable, decoupled services; automated invoice retries; unit, integration, functional and end-to-end tests. Go is the implementation language. Employer explicitly considers backend engineers switching to Go from PHP, Java, Kotlin or Python. Requirements: 2+ years backend engineering, high-load systems, PostgreSQL, queues or streams, automated testing. Payment and fintech experience, AWS and CI/CD are advantages. [Normalized summary of official job description, not a verbatim or complete snapshot.]",
+      "url": "https://solidgate.com/careers/34fee32d-2a5a-4709-b31f-b3b0219dcdc4/",
+      "apply_url": "https://solidgate.com/careers/34fee32d-2a5a-4709-b31f-b3b0219dcdc4/",
+      "remote": true,
+      "salary_text": null,
+      "verified_live": false,
+      "verified_at": null
+    },
+    "remote_policy": "The official indexed role advertises Europe and Remote. Company-wide careers FAQ describes an office-first culture even while offering remote, hybrid and on-site options. Specific attendance terms should be confirmed.",
+    "candidate_requirements": [
+      "2+ years of backend engineering (PHP accepted for Go transition)",
+      "High-load backend system design",
+      "PostgreSQL and queues or streams",
+      "Unit, integration and functional automated testing",
+      "API design and payment/billing workflows"
+    ],
+    "expected_eligibility": "review",
+    "expected_fit": "strong",
+    "label_confidence": "medium",
+    "label_evidence": [
+      "Official cached posting explicitly includes PHP as a qualifying backend language for Go transition",
+      "Official indexed posting lists Europe and Remote",
+      "Company careers FAQ says office-first; role-specific attendance conditions not verified",
+      "Current official job-detail request returned 404 in one verification attempt; application acceptance not confirmed"
+    ],
+    "known_gaps": [
+      "Production Go experience not established",
+      "Exact employment and salary terms undisclosed"
+    ],
+    "explanation": "Very strong backend/payments fit and an explicit PHP-to-Go pathway. Kept in review because job-specific live verification failed and employer office-attendance terms are ambiguous. An originally archived, verified-live remote posting could instead support a historical eligible label."
+  },
+  {
+    "id": "E11",
+    "type": "historical_application",
+    "snapshot_origin": "reconstructed_from_official_ashby_posting",
+    "snapshot_date": "2026-10-22",
+    "user_decision": "applied",
+    "job": {
+      "provider": "ashby",
+      "board": "coder",
+      "external_id": "8d76dce2-97f7-413e-a93e-9e3f0ba8d259",
+      "company": "Coder",
+      "title": "Software Engineer (Enterprise Experience, Backend)",
+      "location": "Europe - Remote; Poland included",
+      "description": "Enterprise Experience backend engineering: build operator-facing scaling, upgrades, reliability, observability, reporting, audit and security functionality; safe SQL database migrations; diagnose scalability and concurrency bottlenecks and join on-call. Requires professional experience shipping Go and working understanding of goroutines, channels and sync package; SQL and debugging skills. Backend stack Go, PostgreSQL, Kubernetes, gRPC. [Normalized summary of official job description, not a verbatim or complete snapshot.]",
+      "url": "https://jobs.ashbyhq.com/coder/8d76dce2-97f7-413e-a93e-9e3f0ba8d259/",
+      "apply_url": "https://jobs.ashbyhq.com/coder/8d76dce2-97f7-413e-a93e-9e3f0ba8d259/",
+      "remote": true,
+      "salary_text": "Poland: 303,000-410,000 PLN/year; employment type full time",
+      "verified_live": false,
+      "verified_at": null
+    },
+    "remote_policy": "Official Ashby posting explicitly lists Europe Remote and a Poland-specific salary band.",
+    "candidate_requirements": [
+      "2+ years professional software development",
+      "Professional experience writing and shipping Go",
+      "Working knowledge of Go concurrency: goroutines, channels, sync",
+      "SQL and schema/database migration experience",
+      "Production debugging, observability and on-call"
+    ],
+    "expected_eligibility": "review",
+    "expected_fit": "partial",
+    "label_confidence": "high",
+    "label_evidence": [
+      "Official indexed Ashby job offers remote Europe and Poland-specific compensation",
+      "Official job explicitly requires professional Go and Go concurrency",
+      "Candidate profile lacks established production Go specialization",
+      "Ashby JavaScript page not independently verified for functioning submission in this run"
+    ],
+    "known_gaps": [
+      "Professional production Go and concurrency experience"
+    ],
+    "explanation": "Remote location and compensation align, and backend/database/reliability experience transfers well. However, professional Go and its concurrency model are explicit requirements and not documented in the candidate profile, so this should not be a strong eligible golden example."
+  },
+  {
+    "id": "E12",
+    "type": "historical_application",
+    "snapshot_origin": "reconstructed_from_official_workable_posting",
+    "snapshot_date": "2026-10-22",
+    "user_decision": "applied",
+    "job": {
+      "provider": "workable",
+      "board": "modash",
+      "external_id": "2FAA7C0BC6",
+      "company": "Modash",
+      "title": "Senior Backend Engineer - Data Core (remote, Europe)",
+      "location": "Remote Europe; Krakow, Poland included",
+      "description": "Data Core: operate large-scale collection and maintenance of 400M+ creator profiles, resilient third-party integrations, partial failures, rate limits, performance, freshness, monitoring, and cost optimization. Requirements include large-scale backend/data systems, distributed-system operation, resilient API integrations, production ownership, and experience with proxy management or routing. Primary stack TypeScript/Node.js, PostgreSQL, AWS, SQS, and proxy networks. [Normalized summary of official job description, not a verbatim or complete snapshot.]",
+      "url": "https://apply.workable.com/modash/j/2FAA7C0BC6/",
+      "apply_url": "https://apply.workable.com/modash/j/2FAA7C0BC6/",
+      "remote": true,
+      "salary_text": "EUR 80,000-110,000 per year plus stock options",
+      "verified_live": true,
+      "verified_at": "2026-10-22"
+    },
+    "remote_policy": "Official posting explicitly states fully remote within Europe, lists Krakow in Poland, and notes occasional company offsites.",
+    "candidate_requirements": [
+      "Large-scale backend/data systems and distributed systems",
+      "Third-party API reliability including retries and rate limiting",
+      "Observability and production ownership",
+      "Proxy management or high-volume request routing",
+      "TypeScript/Node.js primary stack (transition gap)"
+    ],
+    "expected_eligibility": "eligible",
+    "expected_fit": "strong",
+    "label_confidence": "medium",
+    "label_evidence": [
+      "Official Workable description explicitly confirms fully remote Europe and Krakow, Poland",
+      "Official job and separate application page were indexed at time of research",
+      "Production incident investigation, high-volume integrations and backend/data reliability overlap strongly with candidate experience",
+      "Salary band broadly aligns with candidate compensation expectations"
+    ],
+    "known_gaps": [
+      "Professional Node.js/TypeScript specialization not established",
+      "Direct proxy infrastructure and anti-bot routing experience not established"
+    ],
+    "explanation": "Positive high-fit historical application example: explicit Poland-supported Europe remote role, suitable compensation, and strong data-intensive backend/reliability overlap. Stack and proxy-routing gaps are recorded, not falsely credited; eligibility is distinct from perfect technical fit."
   }
-
 ]
