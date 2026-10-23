@@ -2,6 +2,7 @@ import re
 
 from job_hunter.models import Job, Match, Eligibility, EligibilityFactors
 from job_hunter.classify_remote import classify_remote
+from job_hunter.classify_location import classify_location
 ROLE = re.compile(
     r"(backend|back.end|software engineer|php|platform|"
     r"reliability|sre|integration|product engineer|"
@@ -44,6 +45,12 @@ def evaluate(job: Job, profile: dict) -> Match:
     elif HYBRID.search(job.description):
         concerns.append("Office / hybrid language in description; manual verification needed")
     location_supported = bool(POLAND.search(loc) or POLAND.search(job.description))
+    location_eligibility = classify_location(job.location, job.description)
+    if location_eligibility == Eligibility.rejected:
+        rejected = True
+        concerns.append("Location restriction excludes candidates based in Poland")
+    elif location_eligibility == Eligibility.review:
+        concerns.append("Location eligibility requires verification")
     remote_claim = bool(job.remote is True or REMOTE.search(loc) or REMOTE.search(job.description))
     remote_eligibility = classify_remote(
         remote=job.remote,
@@ -95,6 +102,7 @@ def evaluate(job: Job, profile: dict) -> Match:
 
     elif (
             remote_eligibility == Eligibility.review
+            or location_eligibility == Eligibility.review
             or management_review
             or not location_supported
             or not job.verified_live
@@ -123,5 +131,4 @@ def aggregate_eligibility(factors: EligibilityFactors) -> Eligibility:
         return Eligibility.review
 
     return Eligibility.eligible
-
 

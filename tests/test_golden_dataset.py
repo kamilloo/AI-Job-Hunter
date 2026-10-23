@@ -4,6 +4,7 @@ import pytest
 from pathlib import Path
 from job_hunter.models import Job, Eligibility
 from job_hunter.evaluate import evaluate, ROLE
+from job_hunter.classify_location import classify_location
 
 FIXTURES = json.loads((Path(__file__).parent.parent / "evaluations/fixtures/jobs.json").read_text())
 
@@ -23,13 +24,12 @@ class TestGoldenDataset(unittest.TestCase):
             with self.subTest(id=case["id"]):
                 job = Job(**case["job"])
                 match = evaluate(job,self._profile())
-                if case["id"] == "E08":
-                    print("TITLE:", job.title)
-                    print("ROLE MATCH:", bool(ROLE.search(job.title)))
-                    print("REMOTE:", job.remote)
-                    print("VERIFIED:", job.verified_live)
-                    print("RESULT:", match.eligibility.value)
-                    print("CONCERNS:", match.concerns)
+                if case["id"] in ("E02", "E05", "E07", "E12"):
+                    print(f"\n{case['id']}: {job.title}")
+                    print("Expected:", case["expected_eligibility"])
+                    print("Predicted:", match.eligibility.value)
+                    print("Reasons:", match.reasons)
+                    print("Concerns:", match.concerns)
 
                 self.assertEqual(
                     Eligibility(case["expected_eligibility"]).value,
@@ -56,6 +56,14 @@ class TestGoldenDataset(unittest.TestCase):
             "people-management" in concern.lower()
             for concern in match.concerns
         )
+
+    def test_e03_francy_only(self):
+        case = next(c for c in FIXTURES if c["id"] == "E03")
+        job = Job(**case["job"])
+        assert classify_location(
+            job.location,
+            job.description
+        ) == Eligibility.rejected
 
 if __name__ == '__main__':
     unittest.main()
