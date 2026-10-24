@@ -1,4 +1,3 @@
-
 [
   {
     "id": "E01",
@@ -22,9 +21,7 @@
       "AWS and cloud infrastructure",
       "Observability",
       "AI platform infrastructure"
-    ],
-    "expected_eligibility": "review",
-    "explanation": "ATS detail was verified, but the recorded evidence does not establish remote eligibility from Poland. Rejection requires explicit exclusion evidence or another confirmed hard restriction."
+    ]
   },
   {
     "id": "E02",
@@ -47,9 +44,7 @@
       "PostgreSQL",
       "REST APIs",
       "Docker"
-    ],
-    "expected_eligibility": "eligible",
-    "explanation": "Poland remote is explicitly supported, ATS status is simulated as verified, and the position matches core backend skills."
+    ]
   },
   {
     "id": "E03",
@@ -71,9 +66,7 @@
       "AWS",
       "Kubernetes",
       "Observability"
-    ],
-    "expected_eligibility": "rejected",
-    "explanation": "The job explicitly restricts employment to France. Strong technical fit cannot override location ineligibility."
+    ]
   },
   {
     "id": "E04",
@@ -92,8 +85,8 @@
       "verified_at": "2026-10-21"
     },
     "remote_policy": "The employer explicitly supports candidates in Poland or the Czech Republic. Fully remote work is not explicitly confirmed in the official job description.",
-     "candidate_requirements": [
-       "Senior PHP development",
+    "candidate_requirements": [
+      "Senior PHP development",
       "Symfony",
       "Doctrine ORM 3",
       "MySQL and SQL performance optimization",
@@ -102,11 +95,9 @@
       "CI/CD and PHPUnit",
       "Distributed systems and concurrency",
       "Production reliability"
-    ],
-    "expected_eligibility": "review",
-    "explanation": "The official application page is available and the technical requirements align strongly with the candidate. Poland is supported, but fully remote work without recurring office attendance is not established by the official listing. Manual confirmation is required."
+    ]
   },
-    {
+  {
     "id": "E05",
     "type": "real_snapshot",
     "job": {
@@ -123,18 +114,16 @@
       "verified_at": "2026-10-21"
     },
     "remote_policy": "Remote-first role; Poland explicitly included among eligible locations.",
-     "candidate_requirements": [
-       "Full-stack engineer",
+    "candidate_requirements": [
+      "Full-stack engineer",
       "Typescript",
       "Electron/React UI, Node services",
       "Go",
       "Deep debugging and performance instincts",
       "UX"
-    ],
-    "expected_eligibility": "review",
-    "explanation": "Poland and remote-first work are explicitly supported. However, the position requires strong TypeScript/React/Node and Go full-stack exginiiring skills, while the candidate's main production experience is PHP/backend. The position offers significant AI engineering growth potenial, but the specialist stack mismatch requires manual assessment."
+    ]
   },
-    {
+  {
     "id": "E06",
     "type": "real_snapshot",
     "job": {
@@ -144,22 +133,20 @@
       "company": "Box",
       "title": "Senior Software Engineer, Partner Integrations",
       "location": "Warsaw, Mazowieckie, Poland",
-      "description": "WHAT IS BOX?\n\nBox (NYSE:BOX) is the leader in Intelligent Content Management. Our platform enables organizations to fuel collaboration, manage the entire content lifecycle, secure critical content, and transform business workflows with enterprise AI. We help companies thrive in the new AI-first era of business. Founded in 2005, Box simplifies work for leading global organizations, including JLL, Morgan Stanley, and Nationwide. Box is headquartered in Redwood City, CA, with offices across the United States, Europe, and Asia.\n\nBy joining Box, you will have the unique opportunity to continue driving our platform forward. Content powers how we work. It’s the billions of files and information flowing across teams, departments, and key business processes every single day: contracts, invoices, employee records, financials, product specs, marketing assets, and more. Our mission is to bring intelligence to the world of content management and empower our customers to completely transform workflows across their organizations. With the combination of AI and enterprise content, the opportunity has never been greater to transform how the world works together and at Box you will be on the front lines of this massive shift.\n\nAt Box, we believe unique and diverse experiences benefit our culture, our products, our customers, our company, and our world. We aim to recruit a passionate, high-performing workforce that reflects the world we live in. If you are head-over-heels about this role but unsure if you meet all the requirements, we encourage you to apply!\n\nWhat is Box?\n\nBox (NYSE: BOX) is the leader in Intelligent Content Management. Our platform enables organisations to fuel collaboration, manage the entire content lifecycle, secure critical content, and transform business workflows with enterprise AI. We help companies thrive in the new AI-first era of business. Founded in 2005, Box simplifies work for leading global organisations, including JLL, Morgan Stanley, and Nationwide. Box is headquartered in Redwood City, CA, with offices across the United States, Europe, and Asia.\n\nBy joining Box, you will have the unique opportunity to continue driving our platform forward. Content powers how we work. It's the billions of files and information flowing across teams, departments, and key business processes every single day: contracts, invoices, employee records, financials, product specs, marketing assets, and more. Our mission is to bring intelligence to the world of content management and empower our customers to completely transform workflows across their organizations. With the combination of AI and enterprise content, the opportunity has never been greater to transform how the world works together and at Box you will be on the front lines of this massive shift.\n\nWhy Box needs you:\n\nAs a Senior Software Engineer on the Partner Integrations team at Box Poland, you'll be part of a team that builds and maintains apps, product integrations, and frameworks for Box's most strategic partners — including big tech companies. In this role, you will work on medium and large-scale projects alongside a dedicated development team and Product Manager, driving the development of new integration versions that bring new features and capabilities to our partners. The Partner Integrations team is a pillar of the company, and your work will have a direct and meaningful impact on how Box's platform extends into the broader ecosystem.\n\nWhat you'll do:\n\nAttend and engage in daily stand-ups, maintain sprint tasks, and keep your work visible and up to date in project tracking tools\nAttend weekly team meetings, project syncs, and manager 1:1s to stay aligned on priorities and progress\nCollaborate closely with the Product Manager to refine requirements, clarify scope, and ensure technical solutions meet business needs\nWork collaboratively with other engineers, team members, and external partners across teams and time zones\nRespond constructively to feedback and continuously improve the quality and reliability of your work\nPlay a role in developing and fostering Box culture in our Poland office\nRepresent Box Poland internally and externally\nParticipate in our on-call rotation, available at all times while on-call to help respond to and triage any issues that arise\nWho you are:\n\nWe are an AI-first company. This means you approach your work with a growth mindset and find ways to leverage AI to help make faster, smarter decisions that will 10X your impact at Box.\n\n5+ years of professional software development experience\nBS, MS, or PhD in Computer Science or equivalent practical experience\nProficient in one or more modern programming languages such as Java, PHP, Node.js, React.js or Python\nStrong understanding of software design principles and testing methodologies\nAbility to assess, communicate, and complete project milestones with your manager and team members in a time-sensitive manner\nAble to adapt to varying technical and stylistic requirements across different integration projects\nAble to review technical feasibility of proposed solutions and provide clear recommendations\nComfortable acting as a technical expert and guide for junior engineers on the team\nExperience providing product support and troubleshooting issues in production environments\nMust speak English proficiently\nPreferred Skills:\n\nPrior experience building partner or third-party integrations\nFamiliarity with Kubernetes and containerized deployment environments\nExperience working in an Agile/Scrum environment\nLeading or contributing to cross-functional projects\nPercentage of Time Spent:\n\n60% coding\n10% technical design\n10% documentation\n10% bug fixes / maintenance\n10% meetings\nMethodology:\n\nAgile management — Scrum\nIssue tracking tool — Jira\nKnowledge repository — GitHub Enterprise\nCode reviews — GitHub Enterprise\nVersion control system — Git\nBENEFITS\nCheck out the overview of Life at Box which include general perks and benefits.\n\nBox lives its values, with community and in-person collaboration being a core part of our culture. Boxers are expected to work from their assigned office a minimum of 3 days per week. Your Recruiter will share more about how we work and company culture during the hiring process.\n\nAt Box, we believe unique and diverse experiences benefit our culture, our products, our customers, our company, and our world. We aim to recruit a passionate, high-performing workforce that reflects the world we live in. If you are head-over-heels about this role but unsure if you meet all the requirements, we encourage you to apply!\n\nEQUAL OPPORTUNITY\n\nWe are an equal opportunity employer and value diversity at our company. We do not discriminate on the basis of race, religion, color, national origin, gender, sexual orientation, age, marital status, veteran status, disability, and any other protected ground of discrimination under applicable human rights legislation.\n\nFor details on how we protect your information when you apply, please see our Personnel Privacy Notice.\n\nFor more details on how Box Poland protects your information, please see our Supplemental Personnel and Candidate Privacy Notice. \n\n#LI-GW1\n\nEQUAL OPPORTUNITY \n\nWe are an equal opportunity employer and value diversity at our company. We do not discriminate on the basis of race, religion, color, national origin, gender, sexual orientation, age, marital status, veteran status, disability, and any other protected ground of discrimination under applicable human rights legislation. Box strives to respect the dignity and \u200E\u200Eindependence of people with disabilities and is committed to giving them the same \u200E\u200Eopportunity to succeed as all other employees. Inclusiveness is core to our culture at Box, and we strive to ensure you get the most from your interview experience.\n\nNOTICE OF USE OF AI \n\nAt Box, we believe in the power of AI to improve the recruiting process while keeping people at the heart of every decision. For more information on the use of AI in our hiring process, please visit our webpage here.",
+      "description": "WHAT IS BOX?\n\nBox (NYSE:BOX) is the leader in Intelligent Content Management. Our platform enables organizations to fuel collaboration, manage the entire content lifecycle, secure critical content, and transform business workflows with enterprise AI. We help companies thrive in the new AI-first era of business. Founded in 2005, Box simplifies work for leading global organizations, including JLL, Morgan Stanley, and Nationwide. Box is headquartered in Redwood City, CA, with offices across the United States, Europe, and Asia.\n\nBy joining Box, you will have the unique opportunity to continue driving our platform forward. Content powers how we work. It’s the billions of files and information flowing across teams, departments, and key business processes every single day: contracts, invoices, employee records, financials, product specs, marketing assets, and more. Our mission is to bring intelligence to the world of content management and empower our customers to completely transform workflows across their organizations. With the combination of AI and enterprise content, the opportunity has never been greater to transform how the world works together and at Box you will be on the front lines of this massive shift.\n\nAt Box, we believe unique and diverse experiences benefit our culture, our products, our customers, our company, and our world. We aim to recruit a passionate, high-performing workforce that reflects the world we live in. If you are head-over-heels about this role but unsure if you meet all the requirements, we encourage you to apply!\n\nWhat is Box?\n\nBox (NYSE: BOX) is the leader in Intelligent Content Management. Our platform enables organisations to fuel collaboration, manage the entire content lifecycle, secure critical content, and transform business workflows with enterprise AI. We help companies thrive in the new AI-first era of business. Founded in 2005, Box simplifies work for leading global organisations, including JLL, Morgan Stanley, and Nationwide. Box is headquartered in Redwood City, CA, with offices across the United States, Europe, and Asia.\n\nBy joining Box, you will have the unique opportunity to continue driving our platform forward. Content powers how we work. It's the billions of files and information flowing across teams, departments, and key business processes every single day: contracts, invoices, employee records, financials, product specs, marketing assets, and more. Our mission is to bring intelligence to the world of content management and empower our customers to completely transform workflows across their organizations. With the combination of AI and enterprise content, the opportunity has never been greater to transform how the world works together and at Box you will be on the front lines of this massive shift.\n\nWhy Box needs you:\n\nAs a Senior Software Engineer on the Partner Integrations team at Box Poland, you'll be part of a team that builds and maintains apps, product integrations, and frameworks for Box's most strategic partners — including big tech companies. In this role, you will work on medium and large-scale projects alongside a dedicated development team and Product Manager, driving the development of new integration versions that bring new features and capabilities to our partners. The Partner Integrations team is a pillar of the company, and your work will have a direct and meaningful impact on how Box's platform extends into the broader ecosystem.\n\nWhat you'll do:\n\nAttend and engage in daily stand-ups, maintain sprint tasks, and keep your work visible and up to date in project tracking tools\nAttend weekly team meetings, project syncs, and manager 1:1s to stay aligned on priorities and progress\nCollaborate closely with the Product Manager to refine requirements, clarify scope, and ensure technical solutions meet business needs\nWork collaboratively with other engineers, team members, and external partners across teams and time zones\nRespond constructively to feedback and continuously improve the quality and reliability of your work\nPlay a role in developing and fostering Box culture in our Poland office\nRepresent Box Poland internally and externally\nParticipate in our on-call rotation, available at all times while on-call to help respond to and triage any issues that arise\nWho you are:\n\nWe are an AI-first company. This means you approach your work with a growth mindset and find ways to leverage AI to help make faster, smarter decisions that will 10X your impact at Box.\n\n5+ years of professional software development experience\nBS, MS, or PhD in Computer Science or equivalent practical experience\nProficient in one or more modern programming languages such as Java, PHP, Node.js, React.js or Python\nStrong understanding of software design principles and testing methodologies\nAbility to assess, communicate, and complete project milestones with your manager and team members in a time-sensitive manner\nAble to adapt to varying technical and stylistic requirements across different integration projects\nAble to review technical feasibility of proposed solutions and provide clear recommendations\nComfortable acting as a technical expert and guide for junior engineers on the team\nExperience providing product support and troubleshooting issues in production environments\nMust speak English proficiently\nPreferred Skills:\n\nPrior experience building partner or third-party integrations\nFamiliarity with Kubernetes and containerized deployment environments\nExperience working in an Agile/Scrum environment\nLeading or contributing to cross-functional projects\nPercentage of Time Spent:\n\n60% coding\n10% technical design\n10% documentation\n10% bug fixes / maintenance\n10% meetings\nMethodology:\n\nAgile management — Scrum\nIssue tracking tool — Jira\nKnowledge repository — GitHub Enterprise\nCode reviews — GitHub Enterprise\nVersion control system — Git\nBENEFITS\nCheck out the overview of Life at Box which include general perks and benefits.\n\nBox lives its values, with community and in-person collaboration being a core part of our culture. Boxers are expected to work from their assigned office a minimum of 3 days per week. Your Recruiter will share more about how we work and company culture during the hiring process.\n\nAt Box, we believe unique and diverse experiences benefit our culture, our products, our customers, our company, and our world. We aim to recruit a passionate, high-performing workforce that reflects the world we live in. If you are head-over-heels about this role but unsure if you meet all the requirements, we encourage you to apply!\n\nEQUAL OPPORTUNITY\n\nWe are an equal opportunity employer and value diversity at our company. We do not discriminate on the basis of race, religion, color, national origin, gender, sexual orientation, age, marital status, veteran status, disability, and any other protected ground of discrimination under applicable human rights legislation.\n\nFor details on how we protect your information when you apply, please see our Personnel Privacy Notice.\n\nFor more details on how Box Poland protects your information, please see our Supplemental Personnel and Candidate Privacy Notice. \n\n#LI-GW1\n\nEQUAL OPPORTUNITY \n\nWe are an equal opportunity employer and value diversity at our company. We do not discriminate on the basis of race, religion, color, national origin, gender, sexual orientation, age, marital status, veteran status, disability, and any other protected ground of discrimination under applicable human rights legislation. Box strives to respect the dignity and ‎‎independence of people with disabilities and is committed to giving them the same ‎‎opportunity to succeed as all other employees. Inclusiveness is core to our culture at Box, and we strive to ensure you get the most from your interview experience.\n\nNOTICE OF USE OF AI \n\nAt Box, we believe in the power of AI to improve the recruiting process while keeping people at the heart of every decision. For more information on the use of AI in our hiring process, please visit our webpage here.",
       "url": "https://job-boards.greenhouse.io/boxinc/jobs/8147790",
       "remote": null,
       "verified_live": true,
       "verified_at": "2026-10-21"
     },
     "remote_policy": "Hybrid. Employees must attend their assigned office at least 3 days per week.",
-     "candidate_requirements": [
-       "5+ years of professional software development experience",
+    "candidate_requirements": [
+      "5+ years of professional software development experience",
       "Java, PHP, Node.js, React.js or Python",
       "Strong understanding of software design principles and testing methodologies"
-    ],
-    "expected_eligibility": "rejected",
-    "explanation": "The official posting explicitly requires at least three days per wee in the assigned office. This violates the candidate's fully remote requirement. The role has strong backend and integrations alignment, but technical fit cannot override mandatory hybrid attenddance. Bo is also listed among previously skipped companies."
+    ]
   },
-      {
+  {
     "id": "E07",
     "type": "real_snapshot",
     "job": {
@@ -176,14 +163,12 @@
       "verified_at": "2026-10-21"
     },
     "remote_policy": "Contractors based in Poland are accepted. ATS metadata indicates remote work, but the job description does not exclicitly define office attendace requirements.",
-     "candidate_requirements": [
-       "2–4 years building production software",
+    "candidate_requirements": [
+      "2–4 years building production software",
       "Strong in Python (FastAPI or similar) and comfortable in TypeScript/JavaScript (React a plus)",
       "Hands-on with AWS and infrastructure-as-code (Terraform)",
-       "Solid Git workflow, CI/CD, and containerized services (Docker)"
-    ],
-    "expected_eligibility": "review",
-    "explanation": "Poland-base B2B contracting is supported, and the role offers relavant AI integration, AWS, and production engineering experience. However, strong production python/FastAPI skills are required, while the candidate's strongest expeience is PHP. The advertised 90-120 PLN/hour rate is below the candidate's approximate hourly floor of over 140 PLN. Fully conditions should also be confirmed."
+      "Solid Git workflow, CI/CD, and containerized services (Docker)"
+    ]
   },
   {
     "id": "E08",
@@ -201,19 +186,17 @@
       "verified_live": true,
       "verified_at": "2026-10-21"
     },
-  "expected_eligibility": "review",
-  "remote_policy": "Official location: Poland - Remote. The application form confirms residence in Poland or a nearby country with travel to Poland offsites as needed.",
-  "candidate_requirements": [
-    "Previous people management experience including 1:1s and performance reviews",
-    "Advanced PHP with Laravel or Symfony",
-    "Technical leadership and architectural decisions",
-    "Hands-on AI adoption",
-    "PHPUnit and automated testing",
-    "Product thinking",
-    "English B2 or higher"
-  ],
-  "explanation": "The remote location and technical stack align strongly with the candidate, and the role offers practical AI adoption opportunities. However, prior formal people-management experience is an explicit must-have and is not established by the candidate profile. Manual assessment is required before recommending this leadership role."
-},
+    "remote_policy": "Official location: Poland - Remote. The application form confirms residence in Poland or a nearby country with travel to Poland offsites as needed.",
+    "candidate_requirements": [
+      "Previous people management experience including 1:1s and performance reviews",
+      "Advanced PHP with Laravel or Symfony",
+      "Technical leadership and architectural decisions",
+      "Hands-on AI adoption",
+      "PHPUnit and automated testing",
+      "Product thinking",
+      "English B2 or higher"
+    ]
+  },
   {
     "id": "E09",
     "type": "real_snapshot",
@@ -230,20 +213,18 @@
       "verified_live": true,
       "verified_at": "2026-10-21"
     },
-  "expected_eligibility": "rejected",
-  "remote_policy": "Warsaw-based hybrid role requiring 1-2 office days per week. The role also requires approximately 25% in-person travel.",
-  "candidate_requirements": [
-    "Extensive software development experience with Java",
-    "Distributed backend services",
-    "REST API development",
-    "Graph-structured or richly relational data",
-    "LLM integration into backend systems",
-    "MCP-based integrations",
-    "Production reliability and data consistency",
-    "Experience with agentic coding tools",
-    "Willingness to travel approximately 25%"
-  ],
-  "explanation": "The role offers valuable AI engineering opportunities through LLM integrations, MCP and context-serving backend systems. However, mandatory Warsaw office attendance of 1-2 days per week conflicts with the candidate's fully remote requirement. The 25% travel expectation and extensive production Java requirement are additional mismatches. The position must be rejected regardless of its AI transition score."
+    "remote_policy": "Warsaw-based hybrid role requiring 1-2 office days per week. The role also requires approximately 25% in-person travel.",
+    "candidate_requirements": [
+      "Extensive software development experience with Java",
+      "Distributed backend services",
+      "REST API development",
+      "Graph-structured or richly relational data",
+      "LLM integration into backend systems",
+      "MCP-based integrations",
+      "Production reliability and data consistency",
+      "Experience with agentic coding tools",
+      "Willingness to travel approximately 25%"
+    ]
   },
   {
     "id": "E10",
@@ -274,8 +255,6 @@
       "Unit, integration and functional automated testing",
       "API design and payment/billing workflows"
     ],
-    "expected_eligibility": "review",
-    "expected_fit": "strong",
     "label_confidence": "medium",
     "label_evidence": [
       "Official cached posting explicitly includes PHP as a qualifying backend language for Go transition",
@@ -286,8 +265,7 @@
     "known_gaps": [
       "Production Go experience not established",
       "Exact employment and salary terms undisclosed"
-    ],
-    "explanation": "Very strong backend/payments fit and an explicit PHP-to-Go pathway. Kept in review because job-specific live verification failed and employer office-attendance terms are ambiguous. An originally archived, verified-live remote posting could instead support a historical eligible label."
+    ]
   },
   {
     "id": "E11",
@@ -318,8 +296,6 @@
       "SQL and schema/database migration experience",
       "Production debugging, observability and on-call"
     ],
-    "expected_eligibility": "review",
-    "expected_fit": "partial",
     "label_confidence": "high",
     "label_evidence": [
       "Official indexed Ashby job offers remote Europe and Poland-specific compensation",
@@ -329,8 +305,7 @@
     ],
     "known_gaps": [
       "Professional production Go and concurrency experience"
-    ],
-    "explanation": "Remote location and compensation align, and backend/database/reliability experience transfers well. However, professional Go and its concurrency model are explicit requirements and not documented in the candidate profile, so this should not be a strong eligible golden example."
+    ]
   },
   {
     "id": "E12",
@@ -361,8 +336,6 @@
       "Proxy management or high-volume request routing",
       "TypeScript/Node.js primary stack (transition gap)"
     ],
-    "expected_eligibility": "eligible",
-    "expected_fit": "strong",
     "label_confidence": "medium",
     "label_evidence": [
       "Official Workable description explicitly confirms fully remote Europe and Krakow, Poland",
@@ -373,7 +346,6 @@
     "known_gaps": [
       "Professional Node.js/TypeScript specialization not established",
       "Direct proxy infrastructure and anti-bot routing experience not established"
-    ],
-    "explanation": "Positive high-fit historical application example: explicit Poland-supported Europe remote role, suitable compensation, and strong data-intensive backend/reliability overlap. Stack and proxy-routing gaps are recorded, not falsely credited; eligibility is distinct from perfect technical fit."
+    ]
   }
 ]
