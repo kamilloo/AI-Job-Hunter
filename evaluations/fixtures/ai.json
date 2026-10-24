@@ -1,0 +1,104 @@
+[
+  {
+    "job_id": "E01",
+    "expected_technical_fit": "unknown",
+    "expected_deterministic_eligibility": "review",
+    "assessment_criteria": [
+      "Recorded description is a placeholder; technical fit and AI transition potential cannot be established."
+    ],
+    "reference_explanation": "ATS detail was verified, but the recorded evidence does not establish remote eligibility from Poland. Rejection requires explicit exclusion evidence or another confirmed hard restriction."
+  },
+  {
+    "job_id": "E02",
+    "expected_technical_fit": "strong",
+    "expected_deterministic_eligibility": "eligible",
+    "assessment_criteria": [
+      "PHP, Laravel, PostgreSQL, Redis and Docker overlap with the candidate profile.",
+      "Backend work alone is not evidence of hands-on AI engineering."
+    ],
+    "reference_explanation": "Poland remote is explicitly supported, ATS status is simulated as verified, and the position matches core backend skills."
+  },
+  {
+    "job_id": "E04",
+    "expected_technical_fit": "strong",
+    "expected_deterministic_eligibility": "review",
+    "assessment_criteria": [
+      "PHP, Symfony, SQL, distributed systems and production reliability transfer directly.",
+      "Company AI marketing does not establish hands-on AI duties for this role."
+    ],
+    "reference_explanation": "The official application page is available and the technical requirements align strongly with the candidate. Poland is supported, but fully remote work without recurring office attendance is not established by the official listing. Manual confirmation is required."
+  },
+  {
+    "job_id": "E05",
+    "expected_technical_fit": "partial",
+    "expected_deterministic_eligibility": "eligible",
+    "assessment_criteria": [
+      "TypeScript/React/Node and Go requirements are production skill gaps, not established candidate experience.",
+      "Coding agents and model orchestration provide direct AI engineering transition opportunities."
+    ],
+    "reference_explanation": "Poland and remote-first work are explicitly supported. However, the position requires strong TypeScript/React/Node and Go full-stack exginiiring skills, while the candidate's main production experience is PHP/backend. The position offers significant AI engineering growth potenial, but the specialist stack mismatch requires manual assessment."
+  },
+  {
+    "job_id": "E07",
+    "expected_technical_fit": "partial",
+    "expected_deterministic_eligibility": "review",
+    "assessment_criteria": [
+      "Production Python/FastAPI requirements need assessment against a PHP-focused background.",
+      "Assess role-specific AI integration duties, not merely AI keywords.",
+      "Compare the advertised 90–120 PLN/hour with the configured 140 PLN/hour floor; do not treat missing terms as satisfied."
+    ],
+    "reference_explanation": "Poland-base B2B contracting is supported, and the role offers relavant AI integration, AWS, and production engineering experience. However, strong production python/FastAPI skills are required, while the candidate's strongest expeience is PHP. The advertised 90-120 PLN/hour rate is below the candidate's approximate hourly floor of over 140 PLN. Fully conditions should also be confirmed."
+  },
+  {
+    "job_id": "E08",
+    "expected_technical_fit": "partial",
+    "expected_deterministic_eligibility": "review",
+    "assessment_criteria": [
+      "Separate strong backend overlap from unestablished formal people-management experience.",
+      "Distinguish practical AI adoption from production model engineering."
+    ],
+    "reference_explanation": "The remote location and technical stack align strongly with the candidate, and the role offers practical AI adoption opportunities. However, prior formal people-management experience is an explicit must-have and is not established by the candidate profile. Manual assessment is required before recommending this leadership role."
+  },
+  {
+    "job_id": "E09",
+    "expected_technical_fit": "partial",
+    "expected_deterministic_eligibility": "rejected",
+    "assessment_criteria": [
+      "LLM integrations, MCP and context-serving systems provide direct AI transition evidence.",
+      "Production Java is a gap; mandatory office attendance still requires rejection."
+    ],
+    "reference_explanation": "The role offers valuable AI engineering opportunities through LLM integrations, MCP and context-serving backend systems. However, mandatory Warsaw office attendance of 1-2 days per week conflicts with the candidate's fully remote requirement. The 25% travel expectation and extensive production Java requirement are additional mismatches. The position must be rejected regardless of its AI transition score."
+  },
+  {
+    "job_id": "E10",
+    "expected_technical_fit": "strong",
+    "expected_deterministic_eligibility": "review",
+    "assessment_criteria": [
+      "Employer explicitly accepts PHP experience for a Go transition.",
+      "Production Go experience is not established.",
+      "A language transition is distinct from an AI engineering transition."
+    ],
+    "reference_explanation": "Very strong backend/payments fit and an explicit PHP-to-Go pathway. Kept in review because job-specific live verification failed and employer office-attendance terms are ambiguous. An originally archived, verified-live remote posting could instead support a historical eligible label."
+  },
+  {
+    "job_id": "E11",
+    "expected_technical_fit": "partial",
+    "expected_deterministic_eligibility": "review",
+    "assessment_criteria": [
+      "Professional Go and concurrency are explicit requirements and unestablished candidate skills.",
+      "SQL, observability and reliability transfer; infrastructure work alone does not establish direct AI duties."
+    ],
+    "reference_explanation": "Remote location and compensation align, and backend/database/reliability experience transfers well. However, professional Go and its concurrency model are explicit requirements and not documented in the candidate profile, so this should not be a strong eligible golden example."
+  },
+  {
+    "job_id": "E12",
+    "expected_technical_fit": "strong",
+    "expected_deterministic_eligibility": "eligible",
+    "assessment_criteria": [
+      "Backend/data reliability and resilient integrations transfer strongly.",
+      "Production Node.js/TypeScript and proxy infrastructure remain gaps.",
+      "Data infrastructure alone does not establish direct AI engineering duties."
+    ],
+    "reference_explanation": "Positive high-fit historical application example: explicit Poland-supported Europe remote role, suitable compensation, and strong data-intensive backend/reliability overlap. Stack and proxy-routing gaps are recorded, not falsely credited; eligibility is distinct from perfect technical fit."
+  }
+]

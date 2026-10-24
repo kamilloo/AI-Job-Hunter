@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Senior backend engineering",
+        "mandatory": "true",
+        "status": "met"
+    },
+    {
+        "name": "Production Go experience",
+        "mandatory": "true",
+        "status": "unknown"
+    }
+]
