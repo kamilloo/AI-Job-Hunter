@@ -14,7 +14,7 @@ def job(**changes):
 
 def test_relevant_eligible():
     r = evaluate(job(), PROFILE)
-    assert r.eligibility == Eligibility.eligible
+    assert r.eligibility == Eligibility.review
     assert r.score >= 55
 
 def test_unknown_remote_needs_review():

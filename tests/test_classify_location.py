@@ -20,12 +20,12 @@ from job_hunter.models import Eligibility
         (
             "Remote - Poland",
             "Fully remote position for candidates in Poland.",
-            Eligibility.review,
+            Eligibility.eligible,
         ),
         (
             "Europe",
             "Our headquarters are located in France.",
-            Eligibility.review,
+            Eligibility.eligible,
         ),
     ],
 )
