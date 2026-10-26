@@ -42,4 +42,17 @@ AI calls receive only the candidate profile and employer description. Reference 
 
 This assessor evaluates technical requirements, not the full transition-opportunity or compensation rubric. Those rubric items remain available for human review; the scripts do not claim an automatic technical-fit/transition accuracy score. `expected_technical_fit` is not directly comparable to eligibility. `deterministic_correct` compares only deterministic predictions with deterministic labels.
 
-Results are checkpointed after each case. Expected API/validation failures are recorded by error type (and HTTP status where applicable), with null AI/final predictions, and subsequent cases continue. A running artifact after interruption contains completed cases. Exit status is 1 for recorded errors or deterministic label mismatches and 0 otherwise; argument/setup errors also fail the command. `metrics.py` remains a placeholder.
+Results are checkpointed after each case. Expected API/validation failures are recorded by error type (and HTTP status where applicable), with null AI/final predictions, and subsequent cases continue. A running artifact after interruption contains completed cases. Exit status is 1 for recorded errors or deterministic label mismatches and 0 otherwise; argument/setup errors also fail the command.
+
+## Deterministic metrics
+
+Completed reports include a `metrics` object matching `results/metrics.json`.
+The metrics also expose `count`, `false_eligible_count`, and `false_rejected_count` as aliases for `total`, `false_eligible`, and `false_rejected`. `calculate(rows)` accepts saved-report rows or flat `{id, expected, predicted}` rows.
+Calculate the same metrics for an existing deterministic or AI report without API calls:
+
+```bash
+.venv/bin/python -m evaluations.metrics evaluations/results/gemini-e12.json
+.venv/bin/python -m evaluations.metrics evaluations/results/gemini-e12.json --output evaluations/results/gemini-e12-metrics.json
+```
+
+The confusion matrix uses expected labels as rows and deterministic predictions as columns. `false_eligible` counts eligible predictions whose expected label is review or rejected; `false_rejected` counts rejected predictions whose expected label is eligible or review. Mismatches list job ID, expected label and predicted label. Missing labels or predictions count toward `total` but not `compared`; accuracy is null when no rows can be compared. Invalid labels raise an error. AI reports use `expected_deterministic_eligibility` and `deterministic_match.eligibility`, regardless of technical/final predictions or API errors. Output files cannot be overwritten.

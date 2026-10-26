@@ -49,3 +49,13 @@ def test_invalid_prediction_is_rejected():
 
     with pytest.raises(ValueError):
         calculate(rows)
+
+
+def test_flat_and_report_rows_produce_identical_metrics():
+    flat = [{"id": "E01", "expected": "review", "predicted": "eligible"}]
+    report = [{"job_id": "E01", "reference": {"expected_eligibility": "review"},
+               "deterministic_match": {"eligibility": "eligible"}}]
+
+    assert calculate(flat) == calculate(report)
+    assert calculate(flat)["mismatches"] == [
+        {"job_id": "E01", "expected": "review", "predicted": "eligible"}]

@@ -27,6 +27,8 @@ def test_deterministic_artifact_and_overwrite_protection(tmp_path):
     assert result['candidate_profile']['location'] == 'Poland'
     assert [row['final_prediction'] for row in result['results']] == ['eligible', 'rejected']
     assert result['results'][0]['deterministic_match']['reasons']
+    assert result['metrics']['accuracy'] == 1.0
+    assert result['metrics']['compared'] == 2
     with pytest.raises(FileExistsError):
         run_deterministic(options)
 

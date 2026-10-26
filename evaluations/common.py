@@ -8,6 +8,8 @@ from pathlib import Path
 
 import yaml
 
+from evaluations.metrics import calculate
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -86,6 +88,7 @@ def finish(output, artifact):
     artifact['summary'] = {'total': len(artifact['results']), 'errors': errors,
                            'deterministic_correct': sum(comparisons),
                            'deterministic_compared': len(comparisons)}
+    artifact['metrics'] = calculate(artifact['results'])
     artifact['status'] = 'completed_with_errors' if errors else 'completed'
     save(output, artifact)
     print(f"Saved {output} ({len(artifact['results'])} cases, {errors} errors)")

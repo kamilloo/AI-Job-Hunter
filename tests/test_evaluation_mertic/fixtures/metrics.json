@@ -1,0 +1,26 @@
+{
+  "total": 12,
+  "compared": 12,
+  "correct": 12,
+  "accuracy": 1.0,
+  "false_eligible": 0,
+  "false_rejected": 0,
+  "mismatches": [],
+  "confusion_matrix": {
+    "eligible": {
+      "eligible": 3,
+      "review": 0,
+      "rejected": 0
+    },
+    "review": {
+      "eligible": 0,
+      "review": 6,
+      "rejected": 0
+    },
+    "rejected": {
+      "eligible": 0,
+      "review": 0,
+      "rejected": 3
+    }
+  }
+}
