@@ -47,7 +47,7 @@ Results are checkpointed after each case. Expected API/validation failures are r
 ## Deterministic metrics
 
 Completed reports include a `metrics` object matching `results/metrics.json`.
-The metrics also expose `count`, `false_eligible_count`, and `false_rejected_count` as aliases for `total`, `false_eligible`, and `false_rejected`. `calculate(rows)` accepts saved-report rows or flat `{id, expected, predicted}` rows.
+Metric counts use `total`, `false_eligible`, and `false_rejected`. `calculate(rows)` accepts saved-report rows or flat `{id, expected, predicted}` rows.
 Calculate the same metrics for an existing deterministic or AI report without API calls:
 
 ```bash

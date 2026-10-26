@@ -12,7 +12,7 @@ def test_report_can_be_serialized():
             "errors": 0,
             "metrics": {
                 "accuracy": None,
-                "false_eligible_count": 0,
+                "false_eligible": 0,
             },
         },
     }

@@ -24,10 +24,7 @@ def test_deterministic_report_matches_metrics_template():
     report = load('report/deterministic.json')
     metrics = calculate(report['results'])
     template = load('metrics.json')
-    assert {key: metrics[key] for key in template} == template
-    assert metrics['count'] == metrics['total']
-    assert metrics['false_eligible_count'] == metrics['false_eligible']
-    assert metrics['false_rejected_count'] == metrics['false_rejected']
+    assert metrics == template
 
 
 def test_ai_report_uses_deterministic_prediction():

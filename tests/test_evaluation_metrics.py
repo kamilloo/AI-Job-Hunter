@@ -13,7 +13,7 @@ def test_perfect_classification():
     result = calculate(rows)
 
     assert result["accuracy"] == 1.0
-    assert result["false_eligible_count"] == 0
+    assert result["false_eligible"] == 0
     assert result["mismatches"] == []
     assert result["confusion_matrix"]["eligible"]["eligible"] == 1
 
@@ -28,7 +28,7 @@ def test_false_eligible_is_counted():
     result = calculate(rows)
 
     assert result["accuracy"] == 0
-    assert result["false_eligible_count"] == 2
+    assert result["false_eligible"] == 2
     assert result["confusion_matrix"]["review"]["eligible"] == 1
     assert result["confusion_matrix"]["rejected"]["eligible"] == 1
     assert len(result["mismatches"]) == 3
@@ -37,9 +37,9 @@ def test_false_eligible_is_counted():
 def test_empty_results():
     result = calculate([])
 
-    assert result["count"] == 0
+    assert result["total"] == 0
     assert result["accuracy"] is None
-    assert result["false_eligible_count"] == 0
+    assert result["false_eligible"] == 0
 
 
 def test_invalid_prediction_is_rejected():

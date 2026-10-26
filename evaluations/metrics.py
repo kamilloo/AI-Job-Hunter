@@ -13,8 +13,7 @@ def calculate(rows):
     Rows without a reference or prediction count toward total but not compared.
     AI errors do not exclude an available deterministic prediction. Undefined
     accuracy (no comparable rows) is represented by null in JSON.
-    Flat rows with id/expected/predicted are also accepted. Count fields with
-    a _count suffix are aliases for the original report metric fields.
+    Flat rows with id/expected/predicted are also accepted.
     """
     matrix = {expected: dict.fromkeys(LABELS, 0) for expected in LABELS}
     total = compared = correct = false_eligible = false_rejected = 0
@@ -48,8 +47,6 @@ def calculate(rows):
         'accuracy': correct / compared if compared else None,
         'false_eligible': false_eligible, 'false_rejected': false_rejected,
         'mismatches': mismatches, 'confusion_matrix': matrix,
-        'count': total, 'false_eligible_count': false_eligible,
-        'false_rejected_count': false_rejected,
     }
 
 
