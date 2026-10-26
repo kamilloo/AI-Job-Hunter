@@ -101,3 +101,25 @@ def test_ai_loads_root_dotenv_without_overriding_environment(tmp_path, monkeypat
     artifact_text = options.output.read_text()
     assert 'file-key' not in artifact_text
     assert 'exported-key' not in artifact_text
+
+
+def test_generated_report_counts_are_consistent(tmp_path):
+    options = args(tmp_path, "deterministic", ["E02", "E03"])
+    assert run_deterministic(options) == 0
+
+    report = json.loads(options.output.read_text())
+    results = report["results"]
+    summary = report["summary"]
+    metrics = report["metrics"]
+
+    assert summary["total"] == len(results)
+    assert summary["errors"] == sum(
+        row["error"] is not None for row in results
+    )
+    assert metrics["total"] == len(results)
+    assert metrics["correct"] + len(metrics["mismatches"]) == metrics["compared"]
+    assert sum(
+        count
+        for predictions in metrics["confusion_matrix"].values()
+        for count in predictions.values()
+    ) == metrics["compared"]
