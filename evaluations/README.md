@@ -25,7 +25,7 @@ Run from the repository root with the project virtual environment:
 GEMINI_API_KEY='your-key' .venv/bin/python -m evaluations.run_ai_evaluation --model gemini-3.5-flash-lite
 ```
 
-The AI script makes real, billable requests using the production `assess_requirements` implementation. Export credentials in your environment; scripts do not automatically load `.env`. `--model` overrides `GEMINI_MODEL`. Both scripts use `config/profile.yaml` by default; `--profile` can select a richer verified candidate profile. Only recorded profile evidence is sent; the profile is not enriched from other documents.
+The AI script makes real, billable requests using the production `assess_requirements` implementation. It loads `GEMINI_API_KEY` and `GEMINI_MODEL` from the repository root `.env` file; existing environment variables take priority. You can also export credentials in your environment. `--model` overrides `GEMINI_MODEL`. Both scripts use `config/profile.yaml` by default; `--profile` can select a richer verified candidate profile. Only recorded profile evidence is sent; the profile is not enriched from other documents.
 
 Both commands also work as direct scripts, for example `.venv/bin/python evaluations/run_evaluation.py`. Optional arguments:
 

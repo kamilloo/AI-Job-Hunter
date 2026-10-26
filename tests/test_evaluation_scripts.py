@@ -72,3 +72,30 @@ def test_unknown_id_fails_without_writing(tmp_path):
     with pytest.raises(ValueError, match='Unknown evaluation IDs'):
         run_deterministic(options)
     assert not options.output.exists()
+
+
+@pytest.mark.parametrize('environment_key', [None, 'exported-key'])
+def test_ai_loads_root_dotenv_without_overriding_environment(tmp_path, monkeypatch, environment_key):
+    monkeypatch.setattr('evaluations.run_ai_evaluation.ROOT', tmp_path)
+    (tmp_path / '.env').write_text('GEMINI_API_KEY=file-key\nGEMINI_MODEL=file-model\n')
+    # Restore even variables that load_dotenv adds when initially absent.
+    for name in ('GEMINI_API_KEY', 'GEMINI_MODEL'):
+        monkeypatch.setenv(name, '')
+        monkeypatch.delenv(name)
+    if environment_key:
+        monkeypatch.setenv('GEMINI_API_KEY', environment_key)
+    monkeypatch.chdir(tmp_path.parent)
+
+    async def assess(*args, **kwargs):
+        import os
+        assert os.environ['GEMINI_API_KEY'] == (environment_key or 'file-key')
+        assert args[2] == 'file-model'
+        return TechnicalAssessment(requirements=[], summary='No requirements', confidence=0.1)
+
+    monkeypatch.setattr('evaluations.run_ai_evaluation.assess_requirements', assess)
+    options = args(tmp_path, 'ai', ['E02'])
+    options.model = None
+    assert asyncio.run(run_ai(options)) == 0
+    artifact_text = options.output.read_text()
+    assert 'file-key' not in artifact_text
+    assert 'exported-key' not in artifact_text

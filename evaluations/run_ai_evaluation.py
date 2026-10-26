@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'src'))
 
 import httpx
+from dotenv import load_dotenv
 
 from evaluations.common import digest, finish, load_inputs, parser, save
 from job_hunter.agents.requirements_agent import ASSESSMENT_INSTRUCTIONS, assess_requirements, build_prompt
@@ -28,7 +29,9 @@ def final_prediction(deterministic, technical):
 
 
 async def run(args):
-    if not os.getenv('GEMINI_API_KEY'):
+    load_dotenv(ROOT / '.env', override=False)
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    if not gemini_key:
         raise ValueError('Set GEMINI_API_KEY before running live AI evaluation')
     profile, jobs, cases, output, artifact = load_inputs(args, 'ai')
     model = args.model or os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite')
