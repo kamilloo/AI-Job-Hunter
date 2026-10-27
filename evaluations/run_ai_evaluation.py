@@ -4,6 +4,7 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from job_hunter.validation.evidence import validate_job_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -59,7 +60,23 @@ async def run(args):
             try:
                 # Deliberately do not send labels, rubrics or reference explanations.
                 assessment = await assess_requirements(profile, job.description, model, client=client)
+                for requirement in assessment.requirements:
+                    requirement.evidence_validation = validate_job_evidence(
+                        job.description,
+                        requirement.job_evidence,
+                    )
+
+                invalid_evidence = any(
+                    requirement.evidence_validation is None
+                    or not requirement.evidence_validation.valid
+                    for requirement in assessment.requirements
+                )
+
                 technical = technical_eligibility(assessment)
+
+                if invalid_evidence:
+                    technical = Eligibility.review
+
                 # No extracted requirements is insufficient evidence, not a pass.
                 if not assessment.requirements:
                     technical = Eligibility.review

@@ -9,7 +9,8 @@ import pytest
 from evaluations.common import ROOT
 from evaluations.run_evaluation import run as run_deterministic
 from evaluations.run_ai_evaluation import run as run_ai
-from job_hunter.model.RequirementAssessment import TechnicalAssessment
+from job_hunter.model.RequirementAssessment import TechnicalAssessment, TechnicalRequirement
+from job_hunter.validation.evidence import validate_job_evidence, EvidenceValidation
 
 
 def args(tmp_path, kind, ids):
@@ -123,3 +124,35 @@ def test_generated_report_counts_are_consistent(tmp_path):
         for predictions in metrics["confusion_matrix"].values()
         for count in predictions.values()
     ) == metrics["compared"]
+
+def test_invalid_job_evidence_prevents_eligible_result(tmp_path, monkeypatch):
+    monkeypatch.setenv('GEMINI_API_KEY', 'test')
+    requirement = TechnicalRequirement(
+        name="Kubernetes",
+        mandatory=True,
+        status="met",
+        job_evidence="Production Kubernetes experience required",
+        candidate_evidence="",
+        explanation=""
+    )
+    assessor = AsyncMock(return_value=TechnicalAssessment(
+        requirements=[requirement],
+        summary='The candidate has strong Kubernetes experience',
+        confidence=0.9))
+    monkeypatch.setattr('evaluations.run_ai_evaluation.assess_requirements', assessor)
+    options = args(tmp_path, 'ai', ['E02'])
+    assert asyncio.run(run_ai(options)) == 0
+    artifact = json.loads(options.output.read_text())
+    result = artifact["results"][0]
+
+    assert result["deterministic_match"]["eligibility"] == "eligible"
+    assert result["assessment"]["requirements"][0]["evidence_validation"]["valid"] is False
+
+    assert result["technical_prediction"] == "review"
+    assert result["final_prediction"] == "review"
+    assert result["error"] is None
+
+
+    assert artifact['status'] == 'completed'
+    assert artifact['results'][0]['technical_prediction'] == 'review'
+    assert artifact['results'][0]['final_prediction'] == 'review'

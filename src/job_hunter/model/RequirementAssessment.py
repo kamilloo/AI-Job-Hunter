@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from enum import Enum
 
 from job_hunter.models import Eligibility
+from job_hunter.validation.evidence import EvidenceValidation
+
 
 class RequirementStatus(str, Enum):
     met = "met"
@@ -14,6 +16,7 @@ class TechnicalRequirement(BaseModel):
     status: RequirementStatus
 
     job_evidence: str
+    evidence_validation: EvidenceValidation | None = None
     candidate_evidence: str
 
     explanation: str
