@@ -4,6 +4,8 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+from job_hunter.combine_eligibility import combine_eligibility
 from job_hunter.validation.evidence import validate_job_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +18,7 @@ from dotenv import load_dotenv
 from evaluations.common import digest, finish, load_inputs, parser, save
 from job_hunter.agents.requirements_agent import ASSESSMENT_INSTRUCTIONS, assess_requirements, build_prompt
 from job_hunter.evaluate import evaluate
-from job_hunter.model.RequirementAssessment import TechnicalAssessment
+from job_hunter.model.RequirementAssessment import TechnicalAssessment, MatchingAssessment
 from job_hunter.models import Eligibility, Job
 from job_hunter.technical_eligibility import technical_eligibility
 
@@ -55,7 +57,7 @@ async def run(args):
                 'deterministic_match': match.model_dump(mode='json'),
                 'deterministic_correct': match.eligibility.value == case['expected_deterministic_eligibility'],
                 'assessment': None, 'technical_prediction': None,
-                'final_prediction': None, 'error': None,
+                'final_prediction': None, 'matching_assessment': None, 'error': None,
             }
             try:
                 # Deliberately do not send labels, rubrics or reference explanations.
@@ -82,7 +84,16 @@ async def run(args):
                     technical = Eligibility.review
                 row['assessment'] = assessment.model_dump(mode='json')
                 row['technical_prediction'] = technical.value
-                row['final_prediction'] = final_prediction(match.eligibility, technical).value
+                matching = MatchingAssessment(
+                    technical_fit=assessment.technical_fit,
+                    requirement_verification=technical,
+                    final_eligibility=combine_eligibility(
+                        match.eligibility,
+                        technical,
+                    ),
+                )
+                row['matching_assessment'] = matching.model_dump(mode='json')
+                row['final_prediction'] = matching.final_eligibility.value
             except (httpx.HTTPError, ValueError) as exc:
                 # Do not serialize exception messages that may contain credential-bearing data.
                 row['error'] = {'type': type(exc).__name__}

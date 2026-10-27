@@ -1,0 +1,20 @@
+[
+    {
+      "job_id": "E02",
+      "technical_fit": "strong",
+      "requirement_verification": "eligible",
+      "final_eligibility": "eligible"
+    },
+    {
+      "job_id": "E05",
+      "technical_fit": "partial",
+      "requirement_verification": "review",
+      "final_eligibility": "review"
+    },
+    {
+      "job_id": "E12",
+      "technical_fit": "strong",
+      "requirement_verification": "review",
+      "final_eligibility": "review"
+    }
+]

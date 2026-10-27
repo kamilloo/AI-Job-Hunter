@@ -1,3 +1,5 @@
+from functools import partial
+
 from pydantic import BaseModel, Field
 from enum import Enum
 
@@ -9,6 +11,11 @@ class RequirementStatus(str, Enum):
     met = "met"
     unmet = "unmet"
     unknown = "unknown"
+
+class TechnicalFit(str, Enum):
+    strong = "strong"
+    partial = "partial"
+    weak = "weak"
 
 class TechnicalRequirement(BaseModel):
     name: str
@@ -26,6 +33,7 @@ class TechnicalAssessment(BaseModel):
 
     summary: str
     confidence: float = Field(ge=0, le=1)
+    technical_fit: TechnicalFit | None = None
 
 
 class RequirementAssessment(BaseModel):
@@ -39,6 +47,11 @@ class AIRequirementAssessment(BaseModel):
     eligibility: Eligibility
     explanation: str
     confidence: float = Field(ge=0, le=1)
+
+class MatchingAssessment(BaseModel):
+    technical_fit: TechnicalFit | None = None
+    requirement_verification: Eligibility
+    final_eligibility: Eligibility
 
 
 

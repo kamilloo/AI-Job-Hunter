@@ -9,7 +9,7 @@ import pytest
 from evaluations.common import ROOT
 from evaluations.run_evaluation import run as run_deterministic
 from evaluations.run_ai_evaluation import run as run_ai
-from job_hunter.model.RequirementAssessment import TechnicalAssessment, TechnicalRequirement
+from job_hunter.model.RequirementAssessment import TechnicalAssessment, TechnicalRequirement, TechnicalFit
 from job_hunter.validation.evidence import validate_job_evidence, EvidenceValidation
 
 
@@ -44,6 +44,12 @@ def test_ai_records_full_assessment_without_reference_leakage(tmp_path, monkeypa
     artifact = json.loads(options.output.read_text())
     assert artifact['results'][0]['assessment'] == assessment.model_dump(mode='json')
     assert artifact['results'][0]['final_prediction'] == 'review'
+    assert artifact['results'][0]['assessment']['technical_fit'] is None
+    assert artifact['results'][0]['matching_assessment'] == {
+        'technical_fit': None,
+        'requirement_verification': 'review',
+        'final_eligibility': 'review',
+    }
     assert artifact['results'][1]['final_prediction'] == 'rejected'
     assert artifact['assessor']['model'] == 'gemini-test'
     assert 'not-for-artifacts' not in options.output.read_text()
@@ -151,8 +157,55 @@ def test_invalid_job_evidence_prevents_eligible_result(tmp_path, monkeypatch):
     assert result["technical_prediction"] == "review"
     assert result["final_prediction"] == "review"
     assert result["error"] is None
+    assert result["matching_assessment"]["requirement_verification"] == "review"
 
 
     assert artifact['status'] == 'completed'
     assert artifact['results'][0]['technical_prediction'] == 'review'
     assert artifact['results'][0]['final_prediction'] == 'review'
+
+
+def test_strong_technical_fit_with_unknown_mandatory_requirement(
+    tmp_path,
+    monkeypatch,
+):
+    monkeypatch.setenv("GEMINI_API_KEY", "test")
+
+    requirement = TechnicalRequirement(
+        name="PHP backend experience",
+        mandatory=True,
+        status="unknown",
+        job_evidence="Senior backend role using PHP",
+        candidate_evidence="",
+        explanation="Candidate's PHP backend experience is not documented in this assessment",
+    )
+
+    assessment = TechnicalAssessment(
+        requirements=[requirement],
+        summary="Strong transferable backend engineering experience",
+        confidence=0.9,
+        technical_fit=TechnicalFit.strong,
+    )
+
+    assessor = AsyncMock(return_value=assessment)
+
+    monkeypatch.setattr(
+        "evaluations.run_ai_evaluation.assess_requirements",
+        assessor,
+    )
+
+    options = args(tmp_path, "ai", ["E02"])
+
+    assert asyncio.run(run_ai(options)) == 0
+    assessor.assert_awaited_once()
+
+    artifact = json.loads(options.output.read_text())
+    result = artifact["results"][0]
+
+    assert result["error"] is None
+    assert result["deterministic_match"]["eligibility"] == "eligible"
+    assert result["assessment"]["requirements"][0]["evidence_validation"]["valid"] is True
+    assert result["assessment"]["requirements"][0]["status"] == "unknown"
+    assert result["assessment"]["technical_fit"] == "strong"
+    assert result["technical_prediction"] == "review"
+    assert result["final_prediction"] == "review"
