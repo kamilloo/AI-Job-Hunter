@@ -187,20 +187,50 @@ Track source code, fixtures, configuration and tests in Git. Generate timestampe
 
 ### Milestone 5 — Technical Assessment Quality and Grounding
 
-**Status: Planned**
+**Status: Tasks 5.1–5.3 completed locally and validated by reported tests/live evaluation; Task 5.4 next. Implementation changes must be synced from the local checkout.**
 
-**Goal:** Improve the quality of LLM-generated technical assessments using measured evidence.
+**Goal:** Make Gemini technical assessments grounded, distinguish overall fit from mandatory requirement verification, and turn discovered model failures into reproducible regressions.
 
-**Planned scope:**
-- Separate mandatory, preferred, and optional job requirements.
-- Prevent LLMs from treating transferable skills as verified production experience.
-- Improve candidate evidence, including concrete engineering experience.
-- Validate job evidence against source descriptions.
-- Distinguish technical fit from strict verification of mandatory skills.
-- Expand the labeled AI evaluation dataset.
-- Analyze failure cases and compare assessment changes against the baseline.
+**Task 5.1 — Grounding and evidence validation (completed locally)**
+- Deterministic normalized exact-quotation validation against employer job descriptions.
+- Positive, negative, fabricated-quotation and whitespace unit tests.
+- Evidence validation recorded per technical requirement.
+- Untrusted quotations trigger conservative review rather than unsupported eligibility.
+- Mocked E02 integration test verifies a fabricated quotation cannot produce an automatic eligible decision.
 
-**Completion criteria:** The AI assessment pipeline demonstrates measurable improvements in evidence quality and technical-fit judgments without increasing unsafe positive recommendations.
+**Task 5.2 — Technical fit versus mandatory verification (completed locally)**
+- Separate `TechnicalFit` (strong / partial / weak) from `requirement_verification` and `final_eligibility`.
+- Combine deterministic eligibility and requirement verification using the most restrictive state.
+- Test all nine eligibility combinations.
+- Preserve strong transferable fit while requiring review for unverified mandatory skills.
+
+**Task 5.3 — Structured candidate evidence (completed locally)**
+- Pydantic candidate-experience records with technology, context, production usage and years; absent information stays unknown.
+- Backward-compatible YAML profile enrichment and tests.
+- Gemini request payload includes structured experience rather than only flat skill keywords.
+- Live E05 and E12 reassessments captured for analysis.
+- A focused live Gemini regression correctly classified a preferred full-stack job title without documented work history as `mandatory=true`, `status=unknown`, `candidate_evidence=""`.
+- Gemini instructions refined to prohibit treating preferred titles or transferable technologies as direct proof of unrelated production experience.
+
+**Task 5.4 — Expand and compare AI evaluations (next)**
+- Add focused negative regressions: Redis queues do not prove AWS SQS; missing TypeScript/Node.js evidence is unknown rather than automatically unmet.
+- Introduce positive controls and expand reference coverage for mandatory/optional requirements.
+- Report AI technical-fit agreement separately from deterministic eligibility accuracy.
+- Measure requirement-status agreement, quotation grounding, and evidence-quality violations.
+- Compare model and prompt revisions against saved baseline results.
+
+**Observed limitations and next quality targets**
+- E12's overall technical-fit `partial` disagreed with the curated `strong` reference, although mandatory verification still correctly required review.
+- An E12 run marked SQS `met` based on transferable Redis queue experience and marked undocumented TypeScript/Node.js `unmet`; these are regression targets.
+- One E12 generated quotation failed exact source validation; validation guards did expose this.
+- E12 is a reconstructed, normalized historical job summary rather than a complete verbatim original posting.
+- The focused requirement runner recorded `evidence_validation: null`; consider applying shared source-grounding verification there too.
+- Structured experience input included contradictory Docker fields (`production: false` with context claiming production usage); resolve from verified career facts.
+- A passing focused Gemini case does not guarantee all future model assessments are correct. Generated run artifacts remain excluded from version control.
+
+**Checkpoint:** Before Task 5.4, commit and push the local implementation, tests, fixtures, profile and shared prompt updates. This document alone does not ship those changes.
+
+**Completion criteria:** The assessment pipeline demonstrates measurable improvements in grounding and requirement classification without increasing unsafe positive recommendations.
 
 ### Milestone 6 — Operational Reliability
 
@@ -252,11 +282,11 @@ The project will be considered successful when:
 
 ## 7. Current Priorities
 
-1. Close the remaining small validation and documentation items in Milestone 4.
-2. Establish the current deterministic evaluation as the baseline.
-3. Improve Gemini requirement extraction and evidence validation.
-4. Expand AI evaluation coverage beyond the initial four examples.
-5. Move toward operational reliability and portfolio readiness.
+1. Sync the locally completed Milestone 5.1–5.3 implementation, tests and fixtures to GitHub.
+2. Add focused E12 regression cases and positive controls for Task 5.4.
+3. Measure AI technical-fit and requirement-status agreement separately from deterministic eligibility metrics.
+4. Resolve candidate profile contradictions and improve evidence interpretation.
+5. Proceed to operational reliability and portfolio readiness after AI-quality evaluation is reproducible.
 
 ## 8. Guiding Principle
 
