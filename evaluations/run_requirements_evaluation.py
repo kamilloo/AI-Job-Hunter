@@ -13,19 +13,27 @@ from evaluations.common import ROOT, digest, save
 from job_hunter.agents.requirements_agent import (
     ASSESSMENT_INSTRUCTIONS, assess_requirements, build_prompt,
 )
+from job_hunter.compare_requirements import compare_requirements
 from job_hunter.model.RequirementAssessment import TechnicalAssessment
 
 
-def matches_reference(assessment, expected):
+def matches_reference(assessment, expected, expected_skills: set[str] | None = None,):
     # Wording can vary. This focused fixture has one requirement, so compare
     # its evidence classification rather than model-generated names or prose.
     actual = assessment.model_dump(mode='json')['requirements']
+
+    if expected_skills is not None:
+        return compare_requirements(
+            expected,
+            actual,
+            expected_skills=expected_skills,
+        )
+
     fields = ('mandatory', 'status', 'candidate_evidence')
     return len(actual) == len(expected) and all(
         all(result[field] == reference[field] for field in fields)
         for result, reference in zip(actual, expected)
     )
-
 
 async def run(args):
     load_dotenv(ROOT / '.env', override=False)
@@ -54,7 +62,13 @@ async def run(args):
                     case['candidate'], case['job_description'], model, client=client,
                 )
                 row['assessment'] = assessment.model_dump(mode='json')
-                row['passed'] = matches_reference(assessment, case['expected_requirements'])
+                row["passed"] = matches_reference(
+                    assessment,
+                    case["expected_requirements"],
+                    expected_skills=set(case["expected_skills"])
+                    if "expected_skills" in case
+                    else None,
+                )
             except (httpx.HTTPError, ValueError) as exc:
                 row['error'] = {'type': type(exc).__name__}
                 if isinstance(exc, httpx.HTTPStatusError):

@@ -2,7 +2,9 @@
   {
     "id": "preferred-full-stack-title-without-experience",
     "candidate": {
-      "primary_titles": ["senior full-stack engineer"],
+      "primary_titles": [
+        "senior full-stack engineer"
+      ],
       "core_skills": [],
       "skill_experiences": []
     },
@@ -15,6 +17,93 @@
         "candidate_evidence": "",
         "explanation": "The candidate lists full-stack engineer as a preferred title, but no supporting professional experience is documented."
       }
-    ]
+    ],
+    "expected_skills": ["full-stack"]
+  },
+  {
+    "id": "redis-queues-do-not-prove-aws-sqs",
+    "candidate": {
+      "primary_titles": [
+        "senior backend engineer"
+      ],
+      "core_skills": [
+        "redis",
+        "aws"
+      ],
+      "skill_experiences": [
+        {
+          "technology": "Redis",
+          "context": "5 years building and operating production queues using Redis.",
+          "production": true,
+          "years": 5
+        },
+        {
+          "technology": "AWS",
+          "context": "Used AWS infrastructure in personal ETL projects. No documented SQS experience.",
+          "production": false,
+          "years": 1
+        }
+      ]
+    },
+    "job_description": "Professional experience with AWS SQS is required for building and operating asynchronous processing pipelines.",
+    "expected_requirements": [
+      {
+        "name": "AWS SQS experience",
+        "mandatory": true,
+        "status": "unknown",
+        "candidate_evidence": "",
+        "explanation": "Redis queue experience is transferable, but direct professional AWS SQS experience is not documented."
+      }
+    ],
+    "expected_skills": ["AWS SQS"]
+  },
+  {
+    "id": "typescript-nodejs-missing-experience-is-unknown",
+    "candidate": {
+      "primary_titles": [
+        "senior backend engineer"
+      ],
+      "core_skills": [
+        "php",
+        "laravel",
+        "postgresql"
+      ],
+      "transferable_languages": [
+        "typescript",
+        "node.js"
+      ],
+      "skill_experiences": [
+        {
+          "technology": "PHP",
+          "context": "10 years building production backend services using PHP.",
+          "production": true,
+          "years": 10
+        },
+        {
+          "technology": "PostgreSQL",
+          "context": "5 years working with PostgreSQL in production.",
+          "production": true,
+          "years": 5
+        }
+      ]
+    },
+    "job_description": "Professional production experience with TypeScript and Node.js is required for this backend engineering position.",
+    "expected_requirements": [
+      {
+        "name": "TypeScript",
+        "mandatory": true,
+        "status": "unknown",
+        "candidate_evidence": "",
+        "explanation": "No documented production TypeScript experience."
+      },
+      {
+        "name": "Node.js",
+        "mandatory": true,
+        "status": "unknown",
+        "candidate_evidence": "",
+        "explanation": "No documented production Node.js experience."
+      }
+    ],
+    "expected_skills": ["TypeScript", "Node.js"]
   }
 ]

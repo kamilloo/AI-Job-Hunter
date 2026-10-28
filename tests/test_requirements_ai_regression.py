@@ -33,3 +33,21 @@ def test_scores_missing_experience_regression(overrides, passed):
 def test_missing_requirements_fail_regression():
     assessment = TechnicalAssessment(requirements=[], summary='', confidence=0.9)
     assert not matches_reference(assessment, CASE['expected_requirements'])
+
+@pytest.mark.parametrize(('overrides', 'passed'), [
+    ({}, True),
+    ({'status': 'met'}, False),
+    ({'status': 'unmet'}, False),
+    ({'mandatory': False}, False),
+    ({'candidate_evidence': 'senior full-stack engineer'}, False),
+])
+def test_scores_missing_experience_regression(overrides, passed):
+    requirement = {
+        **CASE['expected_requirements'][0],
+        'job_evidence': CASE['job_description'],
+        **overrides,
+    }
+    assessment = TechnicalAssessment(
+        requirements=[requirement], summary='No documented experience.', confidence=0.9,
+    )
+    assert matches_reference(assessment, CASE['expected_requirements']) is passed
