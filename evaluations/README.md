@@ -44,6 +44,26 @@ This assessor evaluates technical requirements, not the full transition-opportun
 
 Results are checkpointed after each case. Expected API/validation failures are recorded by error type (and HTTP status where applicable), with null AI/final predictions, and subsequent cases continue. A running artifact after interruption contains completed cases. Exit status is 1 for recorded errors or deterministic label mismatches and 0 otherwise; argument/setup errors also fail the command.
 
+## Focused AI requirements regressions
+
+`fixtures/requirements_ai.json` contains isolated candidate profiles and job
+descriptions. The preferred-full-stack-title case requires `unknown`, mandatory
+`true`, and empty candidate evidence when a preferred title has no documented
+experience. Reference explanations are illustrative; exact model wording is not
+scored. Only candidate data and the job description are sent to Gemini.
+
+Run the live regression explicitly (uses the same `.env` configuration):
+
+```bash
+.venv/bin/python -m evaluations.run_requirements_evaluation
+```
+
+The runner saves prompts, references, validated assessments, and pass/fail results
+under `evaluations/results/`. It exits with status 1 for classification mismatches
+or API errors. `--model`, `--dataset`, and `--output` can override defaults.
+Offline scoring checks are in `tests/test_requirements_ai_regression.py`; they do
+not demonstrate Gemini behavior.
+
 ## Deterministic metrics
 
 Completed reports include a `metrics` object matching `results/metrics.json`.

@@ -13,8 +13,14 @@ from job_hunter.agents.requirements_agent import (
 )
 from job_hunter.model.RequirementAssessment import TechnicalAssessment, RequirementStatus
 
+SKILL_EXPERIENCE = {
+        "technology": "Elasticsearch",
+        "context": "Transferred cached profiles from PostgreSQL to Elasticsearch",
+        "production": "true",
+        "years": 2
+    }
 
-PROFILE = {"core_skills": ["PHP"], "transferable_languages": ["Go"]}
+PROFILE = {"core_skills": ["PHP"], "transferable_languages": ["Go"], "skill_experiences": [SKILL_EXPERIENCE]}
 DESCRIPTION = "Professional production Go experience required. SQL preferred."
 RESULT = {
     "requirements": [{
@@ -53,6 +59,12 @@ def test_request_schema_prompt_and_validated_result():
             assert payload["generationConfig"]["responseMimeType"] == "application/json"
             assert payload["systemInstruction"]["parts"][0]["text"] == ASSESSMENT_INSTRUCTIONS
             assert payload["contents"][0]["parts"][0]["text"] == build_prompt(PROFILE, DESCRIPTION)
+            prompt = payload["contents"][0]["parts"][0]["text"]
+            assert "Elasticsearch" in prompt
+            assert "PostgreSQL" in prompt
+            assert "production" in prompt
+            assert "years" in prompt
+            assert "Transferred cached profiles from PostgreSQL to Elasticsearch" in payload["contents"][0]["parts"][0]["text"]
             return httpx.Response(200, json=response())
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
             result = await assess_requirements(PROFILE, DESCRIPTION, "gemini-test", api_key="test-key", client=client)

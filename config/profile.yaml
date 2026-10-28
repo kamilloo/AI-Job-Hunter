@@ -33,3 +33,86 @@ strong_specialism_gaps: [spark, databricks, delta lake, deep learning, ml resear
 # Existing applications do NOT exclude every future position at that company.
 submitted_companies: [Primer.io, Sensor Tower, Wingspan, Modash, Sezzle, Truv, CaptivateIQ, Solidgate, Sportradar, Elastic, Starburst, N-Ix, Aura, Valtech, Arista Networks, e.construct, RTB House, Akamai, NFQ, Coder, ClickHouse, Nuitée, Focal Systems, Capital.com, Constructor, Supabase, Field Materials]
 skipped_companies: [Nango, Affirm, Katalyst Alliance, Procuros, Prezly, EcoVadis, SkyCell, SANDIS, qlub, Box, Xentral, Clera, CoinsPaid, Xsolla, BnBerry, Reedsy, Redpanda, Fixly, Seerio, Bookinglayer, CloudDevs, Morgan, Plain, Piwik, Telemedi, Fresha, Rho, Backstory, Uncapped, Hostinger, Zoom, LeasingMarkt, think-cell, Surfshark, Ordio, KODANO, OTCF, Sirocco, BlueThrone, CKSource, Fitatu, Open Nexus, Jit Team, WhiteTech, Knapsack, Tidio, RemoDevs, Luxoft, Smart Working, Hospitable, Pleo, PayXpert, TravelLocal, Stape, HealthJoy, Seeking Alpha, Plentific, Oscilar, Bjak, Trading 212, Whatnot, Venn, Reap, Ziploy, Kalepa, SearchApi, Trigger.dev, Zerion, Apollo.io]
+#documented evidence of how the candidate has used those technologies
+skill_experiences:
+  - technology: PHP
+    context: "10+ years PHP and backend experience."
+    production: true
+    years: 10
+
+  - technology: Laravel
+    context: "5 years building SaaS applications and custom business applications using Laravel. Laravel certification."
+    production: true
+    years: 5
+
+  - technology: Symfony
+    context: "Known and used in personal projects"
+    production: false
+    years: 1
+
+  - technology: Yii
+    context: "2+ years hand-on experience"
+    production: true
+    years: 2
+
+  - technology: PostgreSQL
+    context: "Heavy-data database experience"
+    production: true
+    years: 5
+
+  - technology: MySQL
+    context: "Many projects experience"
+    production: true
+    years: 10
+
+  - technology: Redis
+    context: "Building queues and subscription models"
+    production: true
+    years: 5
+
+  - technology: Elasticsearch
+    context: "Led migration of application logs and more than 8 million cached profiles from PostgreSQL to Elasticsearch"
+    production: true
+    years: 2
+
+  - technology: SQL
+    context: ""
+    production: null
+    years: null
+
+  - technology: REST APIs
+    context: "Build backend applications with REST API endpoints for frontend consumption and build integration platform"
+    production: true
+    years: 5
+
+  - technology: Integrations
+    context: "Integrate 3-party aplication, payment gateways, mailable, microservices"
+    production: true
+    years: 3
+
+  - technology: Docker
+    context: "Operated Docker workloads in production, configured development environments, and deployed containers for personal projects."
+    production: true
+    years: 5
+
+  - technology: AWS
+    context: "Presented ELT/ETL pipelines with practical AWS infrastracture"
+    production: false
+    years: 1
+
+  - technology: CI/CD
+    context: "Regression tests pipeline,  running unit and integration. Repository trigger and actions"
+    production: true
+    years: 10
+
+  - technology: Observability
+    context: "Supported with tools like NewRelic, pgbadger and Uptime Kuma"
+    production: true
+    years: 2
+
+  - technology: Reliability
+    context: "Scalable infrastruction with load-balance, 2+ instance, reverse proxy, backup databases"
+    production: true
+    years: 2
+
+

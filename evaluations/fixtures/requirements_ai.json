@@ -1,0 +1,20 @@
+[
+  {
+    "id": "preferred-full-stack-title-without-experience",
+    "candidate": {
+      "primary_titles": ["senior full-stack engineer"],
+      "core_skills": [],
+      "skill_experiences": []
+    },
+    "job_description": "You must have professional full-stack engineering experience building frontend and backend applications.",
+    "expected_requirements": [
+      {
+        "name": "Professional full-stack engineering experience",
+        "mandatory": true,
+        "status": "unknown",
+        "candidate_evidence": "",
+        "explanation": "The candidate lists full-stack engineer as a preferred title, but no supporting professional experience is documented."
+      }
+    ]
+  }
+]
