@@ -14,7 +14,27 @@ from job_hunter.agents.requirements_agent import (
     ASSESSMENT_INSTRUCTIONS, assess_requirements, build_prompt,
 )
 from job_hunter.compare_requirements import compare_requirements
-from job_hunter.model.RequirementAssessment import TechnicalAssessment
+from job_hunter.model.RequirementAssessment import TechnicalAssessment, TechnicalRequirement, RequirementStatus
+from job_hunter.validation.evidence import validate_job_evidence
+from job_hunter.validation.validate_candidate_evidence import validate_candidate_evidence
+
+
+def candidate_grounding_passes(candidate, requirements) -> bool:
+    contexts = [
+        experience["context"]
+        for experience in candidate.get("skill_experiences", [])
+        if experience.get("context")
+    ]
+
+    return all(
+        validate_candidate_evidence(
+            contexts,
+            requirement.candidate_evidence,
+        ).valid
+        if requirement.candidate_evidence.strip()
+        else requirement.status == RequirementStatus.unknown
+        for requirement in requirements
+    )
 
 
 def matches_reference(assessment, expected, expected_skills: set[str] | None = None,):
@@ -61,14 +81,17 @@ async def run(args):
                 assessment = await assess_requirements(
                     case['candidate'], case['job_description'], model, client=client,
                 )
+                for requirement in assessment.requirements:
+                    validation = validate_job_evidence(
+                        job_description=case["job_description"],
+                        evidence=requirement.job_evidence,
+                    )
+                    requirement.evidence_validation = validation
+
                 row['assessment'] = assessment.model_dump(mode='json')
-                row["passed"] = matches_reference(
-                    assessment,
-                    case["expected_requirements"],
-                    expected_skills=set(case["expected_skills"])
-                    if "expected_skills" in case
-                    else None,
-                )
+                result = evaluate_assessment(assessment, case)
+                row.update(result)
+
             except (httpx.HTTPError, ValueError) as exc:
                 row['error'] = {'type': type(exc).__name__}
                 if isinstance(exc, httpx.HTTPStatusError):
@@ -82,6 +105,50 @@ async def run(args):
     print(f"{artifact['status']}: {args.output}")
     return 0 if passed else 1
 
+
+def evaluate_assessment(assessment, case) -> dict:
+    classification_passed = matches_reference(
+        assessment,
+        case["expected_requirements"],
+        expected_skills=set(case["expected_skills"])
+        if "expected_skills" in case
+        else None,
+    )
+
+    grounding_passed = all(
+        validate_job_evidence(
+            case["job_description"],
+            requirement.job_evidence,
+        ).valid
+        for requirement in assessment.requirements
+    )
+
+    contexts = [
+        experience["context"]
+        for experience in case["candidate"].get("skill_experiences", [])
+        if experience.get("context")
+    ]
+
+    candidate_grounding_passed = all(
+        validate_candidate_evidence(
+            contexts,
+            requirement.candidate_evidence,
+        ).valid
+        if requirement.candidate_evidence.strip()
+        else requirement.status == RequirementStatus.unknown
+        for requirement in assessment.requirements
+    )
+
+    return {
+        "classification_passed": classification_passed,
+        "grounding_passed": grounding_passed,
+        "candidate_grounding_passed": candidate_grounding_passed,
+        "passed": (
+            classification_passed
+            and grounding_passed
+            and candidate_grounding_passed
+        ),
+    }
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)

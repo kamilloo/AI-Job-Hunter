@@ -18,7 +18,9 @@
         "explanation": "The candidate lists full-stack engineer as a preferred title, but no supporting professional experience is documented."
       }
     ],
-    "expected_skills": ["full-stack"]
+    "expected_skills": [
+      "full-stack"
+    ]
   },
   {
     "id": "redis-queues-do-not-prove-aws-sqs",
@@ -55,7 +57,9 @@
         "explanation": "Redis queue experience is transferable, but direct professional AWS SQS experience is not documented."
       }
     ],
-    "expected_skills": ["AWS SQS"]
+    "expected_skills": [
+      "AWS SQS"
+    ]
   },
   {
     "id": "typescript-nodejs-missing-experience-is-unknown",
@@ -104,6 +108,49 @@
         "explanation": "No documented production Node.js experience."
       }
     ],
-    "expected_skills": ["TypeScript", "Node.js"]
+    "expected_skills": [
+      "TypeScript",
+      "Node.js"
+    ]
+  },
+  {
+    "id": "verified-aws-sqs-production-experience-is-met",
+    "candidate": {
+      "primary_titles": [
+        "senior backend engineer"
+      ],
+      "core_skills": [
+        "aws",
+        "aws sqs",
+        "redis"
+      ],
+      "skill_experiences": [
+       {
+          "technology": "AWS SQS",
+          "context": "Built and operated AWS SQS queues in production for asynchronous message processing.",
+          "production": true,
+          "years": 3
+        },
+        {
+          "technology": "Redis",
+          "context": "Built Redis-backed production queues.",
+          "production": true,
+          "years": 5
+        }
+      ]
+    },
+    "job_description": "Professional production experience with AWS SQS is required for building and operating asynchronous processing pipelines.",
+    "expected_requirements": [
+      {
+        "name": "AWS SQS",
+        "mandatory": true,
+        "status": "met",
+        "candidate_evidence": "__nonempty__",
+        "explanation": "The candidate has documented production AWS SQS experience."
+      }
+    ],
+    "expected_skills": [
+      "AWS SQS"
+    ]
   }
 ]

@@ -15,11 +15,19 @@ def contains_skill(name: str, skill: str) -> bool:
 
 
 def compare_requirement_fields(expected: dict, actual: dict) -> bool:
-    return (
-        expected["mandatory"] == actual["mandatory"]
-        and expected["status"] == actual["status"]
-        and expected["candidate_evidence"] == actual["candidate_evidence"]
-    )
+    if expected["mandatory"] != actual["mandatory"]:
+        return False
+
+    if expected["status"] != actual["status"]:
+        return False
+
+    expected_evidence = expected["candidate_evidence"]
+    actual_evidence = actual["candidate_evidence"]
+
+    if expected_evidence == "__nonempty__":
+        return bool(actual_evidence.strip())
+
+    return expected_evidence == actual_evidence
 
 
 def compare_requirements(
