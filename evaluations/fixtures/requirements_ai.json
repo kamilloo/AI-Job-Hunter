@@ -20,7 +20,8 @@
     ],
     "expected_skills": [
       "full-stack"
-    ]
+    ],
+    "expected_technical_fit": "weak"
   },
   {
     "id": "redis-queues-do-not-prove-aws-sqs",
@@ -59,7 +60,8 @@
     ],
     "expected_skills": [
       "AWS SQS"
-    ]
+    ],
+    "expected_technical_fit": "partial"
   },
   {
     "id": "typescript-nodejs-missing-experience-is-unknown",
@@ -111,7 +113,8 @@
     "expected_skills": [
       "TypeScript",
       "Node.js"
-    ]
+    ],
+    "expected_technical_fit": "partial"
   },
   {
     "id": "verified-aws-sqs-production-experience-is-met",
@@ -151,6 +154,7 @@
     ],
     "expected_skills": [
       "AWS SQS"
-    ]
+    ],
+    "expected_technical_fit": "strong"
   }
 ]

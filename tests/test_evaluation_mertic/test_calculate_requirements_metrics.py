@@ -87,3 +87,90 @@ def test_failed_gemini_request():
     assert metrics["overall"]["pass_rate"] == 0.0
 
 
+def test_technical_fit_agreement():
+    rows = [
+        {
+            "reference": {"expected_technical_fit": "strong"},
+            "assessment": {"technical_fit": "strong"},
+        },
+        {
+            "reference": {"expected_technical_fit": "partial"},
+            "assessment": {"technical_fit": "weak"},
+        },
+        {
+            "reference": {"expected_technical_fit": "weak"},
+            "assessment": {"technical_fit": "weak"},
+        },
+    ]
+
+    metrics = calculate_requirements_metrics(rows)
+
+    assert metrics["technical_fit"]["compared"] == 3
+    assert metrics["technical_fit"]["correct"] == 2
+    assert metrics["technical_fit"]["agreement_rate"] == 2 / 3
+
+
+def test_technical_fit_for_missing_reference():
+    rows = [
+        {
+            "assessment": None,
+        },
+    ]
+
+    metrics = calculate_requirements_metrics(rows)
+
+    assert metrics["technical_fit"] == {
+        "compared": 0,
+        "correct": 0,
+        "agreement_rate": None,
+        "mismatches": [],
+    }
+
+def test_technical_fit_metrics_do_not_leak_between_calls():
+    calculate_requirements_metrics([
+        {
+            "reference": {"expected_technical_fit": "strong"},
+            "assessment": {"technical_fit": "strong"},
+        }
+    ])
+
+    metrics = calculate_requirements_metrics([
+        {
+            "assessment": None,
+        }
+    ])
+
+    assert metrics["technical_fit"] == {
+        "compared": 0,
+        "correct": 0,
+        "agreement_rate": None,
+        "mismatches": [],
+    }
+
+def test_technical_fit_mismatches():
+    rows = [
+        {
+            "id": "case-a",
+            "reference": {"expected_technical_fit": "strong"},
+            "assessment": {"technical_fit": "strong"},
+        },
+        {
+            "id": "case-b",
+            "reference": {"expected_technical_fit": "partial"},
+            "assessment": {"technical_fit": "weak"},
+        },
+        {
+            "id": "case-c",
+            "reference": {"expected_technical_fit": "weak"},
+            "assessment": {"technical_fit": "partial"},
+        },
+    ]
+
+    metrics = calculate_requirements_metrics(rows)
+
+    assert metrics["technical_fit"]["mismatches"] == [
+        {"id": "case-b", "expected": "partial", "predicted": "weak"},
+        {"id": "case-c", "expected": "weak", "predicted": "partial"},
+    ]
+
+

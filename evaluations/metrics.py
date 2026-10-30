@@ -88,6 +88,43 @@ def calculate_requirements_metrics(rows):
     def rate(numerator, denominator):
         return numerator / denominator if denominator else None
 
+    def calculate_requirements_metrics(rows):
+        technical_fit_compared = 0
+        technical_fit_correct = 0
+        technical_fit_mismatches = []
+
+        for row in rows:
+            reference = row.get("reference") or {}
+            assessment = row.get("assessment") or {}
+
+            expected = reference.get("expected_technical_fit")
+            predicted = assessment.get("technical_fit")
+
+            if expected is None or predicted is None:
+                continue
+
+            technical_fit_compared += 1
+            expected_predicted = expected == predicted
+            technical_fit_correct += expected_predicted
+
+            if not expected_predicted:
+                technical_fit_mismatches.append({
+                    "id": row.get("id"),
+                    "expected": expected,
+                    "predicted": predicted
+                })
+
+        return {
+            "compared": technical_fit_compared,
+            "correct": technical_fit_correct,
+            "agreement_rate": (
+                technical_fit_correct / technical_fit_compared
+                if technical_fit_compared
+                else None
+            ),
+            'mismatches': technical_fit_mismatches
+        }
+
     return {
         "total": total,
         "classification": {
@@ -112,6 +149,7 @@ def calculate_requirements_metrics(rows):
             "total": total,
             "pass_rate": rate(passed, total),
         },
+        'technical_fit': calculate_requirements_metrics(rows)
     }
 
 

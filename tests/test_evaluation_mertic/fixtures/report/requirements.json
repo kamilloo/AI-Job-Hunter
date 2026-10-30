@@ -154,7 +154,8 @@
         ],
         "expected_skills": [
           "full-stack"
-        ]
+        ],
+        "expected_technical_fit": "weak"
       },
       "request_prompt": "CANDIDATE PROFILE\nStructured summary of verified skills and experience.\n{\"primary_titles\": [\"senior full-stack engineer\"], \"core_skills\": [], \"skill_experiences\": []}\n\nJOB DESCRIPTION\nOriginal employer-provided job posting.\n\"You must have professional full-stack engineering experience building frontend and backend applications.\"",
       "assessment": {
@@ -221,7 +222,8 @@
         ],
         "expected_skills": [
           "AWS SQS"
-        ]
+        ],
+        "expected_technical_fit": "partial"
       },
       "request_prompt": "CANDIDATE PROFILE\nStructured summary of verified skills and experience.\n{\"primary_titles\": [\"senior backend engineer\"], \"core_skills\": [\"redis\", \"aws\"], \"skill_experiences\": [{\"technology\": \"Redis\", \"context\": \"5 years building and operating production queues using Redis.\", \"production\": true, \"years\": 5}, {\"technology\": \"AWS\", \"context\": \"Used AWS infrastructure in personal ETL projects. No documented SQS experience.\", \"production\": false, \"years\": 1}]}\n\nJOB DESCRIPTION\nOriginal employer-provided job posting.\n\"Professional experience with AWS SQS is required for building and operating asynchronous processing pipelines.\"",
       "assessment": {
@@ -301,7 +303,8 @@
         "expected_skills": [
           "TypeScript",
           "Node.js"
-        ]
+        ],
+        "expected_technical_fit": "partial"
       },
       "request_prompt": "CANDIDATE PROFILE\nStructured summary of verified skills and experience.\n{\"primary_titles\": [\"senior backend engineer\"], \"core_skills\": [\"php\", \"laravel\", \"postgresql\"], \"transferable_languages\": [\"typescript\", \"node.js\"], \"skill_experiences\": [{\"technology\": \"PHP\", \"context\": \"10 years building production backend services using PHP.\", \"production\": true, \"years\": 10}, {\"technology\": \"PostgreSQL\", \"context\": \"5 years working with PostgreSQL in production.\", \"production\": true, \"years\": 5}]}\n\nJOB DESCRIPTION\nOriginal employer-provided job posting.\n\"Professional production experience with TypeScript and Node.js is required for this backend engineering position.\"",
       "assessment": {
@@ -369,7 +372,8 @@
         ],
         "expected_skills": [
           "AWS SQS"
-        ]
+        ],
+        "expected_technical_fit": "strong"
       },
       "request_prompt": "CANDIDATE PROFILE\nStructured summary of verified skills and experience.\n{\"primary_titles\": [\"senior backend engineer\"], \"core_skills\": [\"aws\", \"aws sqs\", \"redis\"], \"skill_experiences\": [{\"technology\": \"AWS SQS\", \"context\": \"Built and operated AWS SQS queues in production for asynchronous message processing.\", \"production\": true, \"years\": 3}, {\"technology\": \"Redis\", \"context\": \"Built Redis-backed production queues.\", \"production\": true, \"years\": 5}]}\n\nJOB DESCRIPTION\nOriginal employer-provided job posting.\n\"Professional production experience with AWS SQS is required for building and operating asynchronous processing pipelines.\"",
       "assessment": {

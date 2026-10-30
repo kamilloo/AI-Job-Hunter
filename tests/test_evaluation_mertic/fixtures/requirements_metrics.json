@@ -19,5 +19,22 @@
     "passed": 4,
     "total": 4,
     "pass_rate": 1.0
+  },
+  "technical_fit": {
+    "agreement_rate": 0.5,
+    "compared": 4,
+    "correct": 2,
+     "mismatches": [
+      {
+        "id": "preferred-full-stack-title-without-experience",
+        "expected": "weak",
+        "predicted": "partial"
+      },
+      {
+        "id": "typescript-nodejs-missing-experience-is-unknown",
+        "expected": "partial",
+        "predicted": "weak"
+      }
+    ]
   }
 }
