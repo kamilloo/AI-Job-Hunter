@@ -49,6 +49,71 @@ def calculate(rows):
         'mismatches': mismatches, 'confusion_matrix': matrix,
     }
 
+def calculate_requirements_metrics(rows):
+    """Summarize focused Gemini requirement regressions."""
+
+    total = len(rows)
+
+    classification_compared = 0
+    classification_passed = 0
+    grounding_compared = 0
+    grounding_passed = 0
+    candidate_grounding_compared = 0
+    candidate_grounding_passed = 0
+    passed = 0
+
+    for row in rows:
+        requirements = (row.get("assessment") or {}).get("requirements", [])
+
+        if row.get("classification_passed") is not None:
+            classification_compared += 1
+            classification_passed += row["classification_passed"] is True
+
+        if row.get("grounding_passed") is not None:
+            grounding_compared += 1
+            grounding_passed += row["grounding_passed"] is True
+
+        # Only cases containing actual candidate quotations are applicable.
+        has_candidate_quotation = any(
+            requirement.get("candidate_evidence", "").strip()
+            for requirement in requirements
+        )
+
+        if has_candidate_quotation and row.get("candidate_grounding_passed") is not None:
+            candidate_grounding_compared += 1
+            candidate_grounding_passed += row["candidate_grounding_passed"] is True
+
+        passed += row.get("passed") is True
+
+    def rate(numerator, denominator):
+        return numerator / denominator if denominator else None
+
+    return {
+        "total": total,
+        "classification": {
+            "compared": classification_compared,
+            "passed": classification_passed,
+            "pass_rate": rate(classification_passed, classification_compared),
+        },
+        "job_grounding": {
+            "compared": grounding_compared,
+            "passed": grounding_passed,
+            "pass_rate": rate(grounding_passed, grounding_compared),
+        },
+        "candidate_grounding": {
+            "applicable": candidate_grounding_compared,
+            "passed": candidate_grounding_passed,
+            "pass_rate": rate(
+                candidate_grounding_passed, candidate_grounding_compared
+            ),
+        },
+        "overall": {
+            "passed": passed,
+            "total": total,
+            "pass_rate": rate(passed, total),
+        },
+    }
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)

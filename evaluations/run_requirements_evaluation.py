@@ -17,7 +17,7 @@ from job_hunter.compare_requirements import compare_requirements
 from job_hunter.model.RequirementAssessment import TechnicalAssessment, TechnicalRequirement, RequirementStatus
 from job_hunter.validation.evidence import validate_job_evidence
 from job_hunter.validation.validate_candidate_evidence import validate_candidate_evidence
-
+from evaluations.metrics import calculate_requirements_metrics
 
 def candidate_grounding_passes(candidate, requirements) -> bool:
     contexts = [
@@ -98,9 +98,15 @@ async def run(args):
                     row['error']['status_code'] = exc.response.status_code
             artifact['results'].append(row)
             save(args.output, artifact)
-    artifact['finished_at'] = datetime.now(timezone.utc).isoformat()
-    passed = all(row['passed'] for row in artifact['results']) and bool(cases)
-    artifact['status'] = 'passed' if passed else 'failed'
+    artifact["finished_at"] = datetime.now(timezone.utc).isoformat()
+
+    artifact["metrics"] = calculate_requirements_metrics(
+        artifact["results"]
+    )
+
+    passed = all(row["passed"] for row in artifact["results"]) and bool(cases)
+    artifact["status"] = "passed" if passed else "failed"
+
     save(args.output, artifact)
     print(f"{artifact['status']}: {args.output}")
     return 0 if passed else 1

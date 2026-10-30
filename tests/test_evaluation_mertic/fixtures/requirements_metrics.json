@@ -1,0 +1,23 @@
+{
+  "total": 4,
+  "classification": {
+    "passed": 4,
+    "compared": 4,
+    "pass_rate": 1.0
+  },
+  "job_grounding": {
+    "passed": 4,
+    "compared": 4,
+    "pass_rate": 1.0
+  },
+  "candidate_grounding": {
+    "passed": 1,
+    "applicable": 1,
+    "pass_rate": 1.0
+  },
+  "overall": {
+    "passed": 4,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}
