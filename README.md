@@ -96,6 +96,34 @@ The runner loads `.env` when present (without overriding an existing environment
 
 Four exploratory live Gemini evaluations were recorded for E02, E05, E07 and E12. E05 demonstrated a useful `review` decision for unverified TypeScript/Go skills. E12 exposed a meaningful distinction between **strong transferable fit** and **verification of every mandatory requirement**. Do not interpret the existing deterministic classification metrics in these AI reports as a separately validated metric of technical-assessment quality.
 
+### Focused Gemini requirement regressions
+
+The focused regression suite tests known technical-assessment failure modes: preferred titles without verified experience, Redis queues incorrectly treated as AWS SQS experience, missing TypeScript/Node.js production evidence, and a positive control with verified AWS SQS production work. It validates requirement classification, exact quotations from the job posting, and candidate quotations against structured experience records.
+
+```bash
+# Explicit live Gemini calls; requires GEMINI_API_KEY
+python -m evaluations.run_requirements_evaluation
+
+# Offline comparison of two saved focused evaluation reports
+python -m evaluations.compare_reports \
+    evaluations/results/baseline.json \
+    evaluations/results/current.json
+```
+
+The focused runner writes individual validation outcomes and aggregate metrics to a timestamped JSON report. Technical-fit agreement compares Gemini's `strong` / `partial` / `weak` prediction with curated reference labels and records mismatches separately from the classification-and-grounding regression result. The offline comparator matches cases by ID and warns about changes to the dataset, model, instructions, or output schema; a changed prediction is not automatically an improvement.
+
+**Focused live baseline (October 30, 2026; Gemini 3.5 Flash Lite):**
+
+| Measure | Recorded result |
+| --- | ---: |
+| Requirement classification (case-level regression pass) | 4/4 |
+| Job-description quotation grounding | 4/4 |
+| Candidate quotation grounding (cases with nonempty quotations) | 1/1 |
+| Technical-fit agreement against curated labels | 4/4 |
+| Overall focused regression pass | 4/4 |
+
+These are four small, curated regression controls, **not** estimates of accuracy on new job postings. The three cases without candidate quotations correctly leave that evidence blank; they do not count as independently grounded candidate quotations. Exact-substring validation establishes quotation provenance, not whether the evidence logically proves a technical skill. Live results may vary between identical runs.
+
 Run metrics against a saved evaluation report:
 
 ```bash
@@ -121,11 +149,19 @@ The test suite includes classification metrics, malformed labels, empty inputs, 
 | 2. Real discovery and AI integration | ATS sources and optional LLM analysis | Implemented; legacy CLI AI path needs verification |
 | 3. Eligibility vs. scoring | Explicit hard constraints, uncertainty, separate ranking | Completed |
 | 4. Evaluation framework | Golden fixtures, offline and live runners, metrics, tests | Functionally complete; minor validation/documentation refinements |
-| 5. AI quality | Better requirement extraction, evidence grounding, transferable-skill policy | Planned / in progress |
+| 5. AI quality | Structured candidate evidence, deterministic grounding, focused Gemini regressions, metrics and saved-report comparison | Completed |
 | 6. Operational reliability | Rate limits, retries, diagnostics, cost/latency tracking, CI | Planned |
 | 7. Portfolio readiness | Architecture and trade-offs, reproducible demo, documentation | Planned |
 
-See [Project Roadmap](docs/PROJECT_ROADMAP.md) for the fuller goals and milestone criteria (add that document to the repository if it is not present yet).
+See [Project Roadmap](docs/PROJECT_ROADMAP.md) for completed milestones, engineering decisions, known limitations and upcoming priorities.
+
+## Key engineering decisions
+
+- **Deterministic gates remain authoritative:** Confirmed location or remote-work restrictions cannot be overridden by an attractive score or favorable LLM assessment.
+- **Fit differs from verification:** `TechnicalFit` communicates overall alignment and transferable experience; mandatory-requirement verification determines whether evidence is sufficient to proceed without review.
+- **LLM outputs are untrusted until checked:** Requirements cite employer text; deterministic validators check job quotations and candidate quotations against documented experience contexts. Unsupported or missing direct experience remains visible as uncertainty.
+- **Quality measures stay separate:** Deterministic eligibility accuracy, focused requirement-classification pass rates, evidence-grounding rates and technical-fit agreement answer different questions. Small curated datasets are regression tools, not calibrated real-world performance.
+- **Evaluation is reproducible and deliberately opt-in:** Offline tests and report comparisons need no API key. Live Gemini runs are explicit and may incur provider charges; reports preserve useful experiment metadata and remain local.
 
 ## Limitations and safety boundaries
 
@@ -133,7 +169,7 @@ See [Project Roadmap](docs/PROJECT_ROADMAP.md) for the fuller goals and mileston
 - **ATS verification is limited:** Seeing a listing via a public API does not guarantee the external apply form is operational or that employment from Poland is permitted.
 - **Remote and location heuristics:** Regex-based and text-based checks can misinterpret context; manually verify legal eligibility and office requirements before applying.
 - **Compensation:** Rates may be extracted but are not consistently compared across currencies, hourly/monthly periods, tax arrangements, and contract types. Missing compensation is not evidence of suitability.
-- **Technical uncertainty:** An LLM's assessment is not proof of candidate experience; unverified mandatory skills should remain visible.
+- **Technical uncertainty:** An LLM's assessment is not proof of candidate experience; unverified mandatory skills should remain visible. Exact-quotation grounding does not establish semantic correctness, and technical-fit labels can involve judgment.
 - **Scoring:** Relevance and AI-transition scores are baseline heuristics, not calibrated hiring probabilities.
 - **Privacy and artifacts:** Evaluation reports can include candidate-profile content, job descriptions, prompts, and model outputs. Files in `evaluations/results/` are intentionally Git-ignored. Review any artifact before sharing it.
 - **API use:** Live AI runs incur provider costs and may encounter model variability, API errors, and rate limits. Use a supported model and keep API keys out of source control.
