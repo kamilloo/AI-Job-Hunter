@@ -3,11 +3,18 @@ import json
 import os
 from collections.abc import Mapping
 from typing import Any
+import asyncio
+from unicodedata import category
 
 import httpx
 
+from job_hunter.calculate_backoff import calculate_backoff
+from job_hunter.calculate_retry_delay import calculate_retry_delay
+from job_hunter.classify_http_error import classify_http_error, FailureCategory
+from job_hunter.classify_transport_error import classify_transport_error
+from job_hunter.gemini_retry import gemini_retry_safe
 from job_hunter.model.RequirementAssessment import TechnicalAssessment
-
+from job_hunter.should_retry import should_retry
 
 ASSESSMENT_INSTRUCTIONS = """ASSESSMENT INSTRUCTIONS
 1. Extract all technical requirements.
@@ -97,13 +104,47 @@ async def assess_requirements(
     }
 
     async def request(http_client: httpx.AsyncClient) -> TechnicalAssessment:
-        response = await http_client.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/{selected_model}:generateContent",
-            headers={"x-goog-api-key": key},
-            json=payload,
-            timeout=60,
-        )
-        response.raise_for_status()
+        max_attempts = 2
+        for attempt in range(1, max_attempts + 1):
+            try:
+                response = await http_client.post(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{selected_model}:generateContent",
+                    headers={"x-goog-api-key": key},
+                    json=payload,
+                    timeout=60,
+                )
+                response.raise_for_status()
+                break
+            except httpx.HTTPError as exc:
+                if isinstance(exc, httpx.HTTPStatusError):
+                    category = classify_http_error(exc.response.status_code)
+                    retry_safe = True
+
+                    retry_after = (
+                        exc.response.headers.get("Retry-After")
+                        if category == FailureCategory.RATE_LIMITED
+                        else None
+                    )
+                else:
+                    category = classify_transport_error(exc)
+                    retry_safe = gemini_retry_safe(exc)
+                    retry_after = None
+
+                if not should_retry(
+                        category=category,
+                        attempt=attempt,
+                        max_attempts=max_attempts,
+                        retry_safe=retry_safe,
+                ):
+                    raise
+
+                delay = calculate_retry_delay(
+                    attempt=attempt,
+                    retry_after=retry_after,
+                )
+
+                await asyncio.sleep(delay)
+
         candidates = response.json().get("candidates", [])
         if not candidates or candidates[0].get("finishReason") != "STOP":
             raise ValueError("Gemini did not return a completed requirements assessment")
