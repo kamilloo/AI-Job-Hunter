@@ -1,12 +1,8 @@
-from enum import Enum
 import httpx
+from job_hunter.classify_http_error import FailureCategory
 
 
-class HttpTransportCategory(str, Enum):
-    TRANSIENT = "transient"
-    PERMANENT = "permanent"
-
-def classify_transport_error(error: Exception) -> HttpTransportCategory:
+def classify_transport_error(error: Exception) -> FailureCategory:
     if isinstance(
         error,
         (
@@ -16,6 +12,6 @@ def classify_transport_error(error: Exception) -> HttpTransportCategory:
             httpx.RemoteProtocolError,
         ),
     ):
-        return HttpTransportCategory.TRANSIENT
+        return FailureCategory.TRANSIENT
 
-    return HttpTransportCategory.PERMANENT
+    return FailureCategory.PERMANENT

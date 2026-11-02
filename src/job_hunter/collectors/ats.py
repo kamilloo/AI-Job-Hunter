@@ -1,7 +1,15 @@
+import asyncio
 import re
 from html import unescape
 import httpx
 from bs4 import BeautifulSoup
+
+from job_hunter.calculate_retry_delay import calculate_retry_delay
+from job_hunter.should_retry import should_retry
+from job_hunter.classify_http_error import classify_http_error, FailureCategory
+from job_hunter.classify_transport_error import classify_transport_error
+from job_hunter.calculate_backoff import calculate_backoff
+
 from job_hunter.models import Job
 
 SLUG = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$")
@@ -42,8 +50,45 @@ async def collect(client: httpx.AsyncClient, provider: str, slug: str, company: 
     if provider not in urls:
         raise ValueError(f"Unsupported provider: {provider}")
     endpoint, params = urls[provider]
-    response = await client.get(endpoint, params=params)
-    response.raise_for_status()
+
+    max_attempts = 3
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = await client.get(endpoint, params=params)
+            response.raise_for_status()
+            break
+        except httpx.HTTPError as exc:
+            if isinstance(exc, httpx.HTTPStatusError):
+                category = classify_http_error(exc.response.status_code)
+            else:
+                category = classify_transport_error(exc)
+
+            if not should_retry(
+                category,
+                attempt=attempt,
+                max_attempts=max_attempts,
+                retry_safe=True,
+            ):
+                raise
+
+            retry_after = (
+                exc.response.headers.get("Retry-After")
+                if isinstance(exc, httpx.HTTPStatusError)
+                   and category == FailureCategory.RATE_LIMITED
+                else None
+            )
+
+            if category == FailureCategory.RATE_LIMITED:
+                delay = calculate_retry_delay(
+                    attempt=attempt,
+                    retry_after=retry_after,
+                )
+            else:
+                delay = calculate_backoff(attempt=attempt)
+
+            await asyncio.sleep(delay)
+
     data = response.json()
     rows = data if provider == "lever" else data["jobs"]
     results = []
