@@ -11,6 +11,7 @@ from job_hunter.collectors.ats import collect
 from job_hunter.evaluate import evaluate
 from job_hunter.agent import analyze
 from job_hunter.models import Job, Eligibility
+from job_hunter.describe_source_error import describe_source_error
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -22,7 +23,8 @@ def save_job(conn, job):
     conn.execute('INSERT INTO jobs(key,company,title,url,last_seen) VALUES(?,?,?,?,?) ON CONFLICT(key) DO UPDATE SET last_seen=excluded.last_seen',
                  (job.key, job.company, job.title, str(job.url), datetime.now(timezone.utc).isoformat()))
 
-def report(items, errors, path):
+def report(items, errors, path, *, ai_errors=None):
+    ai_errors = ai_errors or []
     by_status = {s: [] for s in Eligibility}
     for job, match in items: by_status[match.eligibility].append((job,match))
     lines = ["# Daily AI Job Hunter", "", f"Generated: {datetime.now(timezone.utc).isoformat()}",
@@ -38,7 +40,31 @@ def report(items, errors, path):
                       f"- **Reasons:** {'; '.join(match.reasons) or 'None established'}",
                       f"- **Concerns:** {'; '.join(match.concerns) or 'None established'}", ""]
     if errors:
-        lines += ["## Collection / verification errors", ""] + [f"- {e}" for e in errors]
+        lines += ["## Collection / verification errors", ""]
+
+        for error in errors:
+            status = (
+                f"HTTP {error['status_code']}"
+                if error["status_code"] is not None
+                else error["error_type"]
+            )
+
+            lines.append(
+                f"- Collection failure: "
+                f"{error['provider']}/{error['board']} — "
+                f"{error['category']} ({status})"
+            )
+
+    if ai_errors:
+        lines += ["", "## AI analysis errors", ""]
+
+        for error in ai_errors:
+            lines.append(
+                f"- AI analysis failure: "
+                f"{error['job_key']} — "
+                f"{error['error_type']}"
+            )
+
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -68,14 +94,23 @@ async def run(args):
     profile = yaml.safe_load(Path(args.profile).read_text(encoding='utf-8'))
     cfg = yaml.safe_load(Path(args.sources).read_text(encoding='utf-8'))
     boards = cfg.get('boards', []) or []
-    errors = []; jobs = []
+    collection_errors = []
+    ai_errors = []
+    jobs = []
+
     async with httpx.AsyncClient(timeout=20, follow_redirects=True, headers={'User-Agent':'AIJobHunter/0.1 (personal research)'}) as client:
         for board in boards:
             try:
                 new = await collect(client, board['provider'], board['slug'], board['company'])
                 jobs.extend(new)
             except (httpx.HTTPError, KeyError, ValueError) as exc:
-                errors.append(f"{board}: {type(exc).__name__}: {exc}")
+                collection_errors.append(
+                    describe_source_error(
+                        provider=board.get("provider", "unknown"),
+                        board=board.get("slug", "unknown"),
+                        error=exc,
+                    )
+                )
         unique = {job.key: job for job in jobs}
         jobs = list(unique.values())
         for job in jobs:
@@ -92,12 +127,17 @@ async def run(args):
             try:
                 match = await analyze(job, match, profile, args.model)
             except Exception as exc:
-                errors.append(f"AI analysis {job.key}: {type(exc).__name__}: {exc}")
+                ai_errors.append(f"AI analysis {job.key}: {type(exc).__name__}: {exc}")
         save_job(conn, job)
         items.append((job, match))
     conn.commit(); conn.close()
-    report(items, errors, Path(args.output))
-    print(f"Wrote {args.output}; {len(items)} results, {len(errors)} warnings")
+    report(
+        items,
+        collection_errors,
+        Path(args.output),
+        ai_errors=ai_errors,
+    )
+    print(f"Wrote {args.output}; {len(items)} results, {len(collection_errors)} warnings, {len(ai_errors)} ai warnings")
 
 def main():
     from dotenv import load_dotenv
