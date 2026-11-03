@@ -1,15 +1,18 @@
 import asyncio
 import re
 import httpx
+import logging
 
 from job_hunter.calculate_retry_delay import calculate_retry_delay
 from job_hunter.collectors.normalize_rows import normalize_rows
 from job_hunter.collectors.normalize_rows import CollectionResult
+from job_hunter.observability import make_log_event, emit_log
 from job_hunter.should_retry import should_retry
 from job_hunter.classify_http_error import classify_http_error, FailureCategory
 from job_hunter.classify_transport_error import classify_transport_error
 
 from job_hunter.models import Job
+logger = logging.getLogger(__name__)
 
 SLUG = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$")
 
@@ -56,6 +59,21 @@ async def collect_with_diagnostics(
                 max_attempts=max_attempts,
                 retry_safe=True,
             ):
+                emit_log(
+                    logger,
+                    make_log_event(
+                        "http_request_failed",
+                        component="ats",
+                        outcome="failure",
+                        attempt=attempt,
+                        status_code=(
+                            exc.response.status_code
+                            if isinstance(exc, httpx.HTTPStatusError)
+                            else None
+                        ),
+                        level=logging.ERROR,
+                    ),
+                )
                 raise
 
             retry_after = (
@@ -69,6 +87,19 @@ async def collect_with_diagnostics(
                 attempt=attempt,
                 retry_after=retry_after,
             )
+            emit_log(logger,
+                     make_log_event(
+                         event="http_retry_scheduled",
+                         component='ats',
+                         outcome="retry",
+                         attempt=attempt,
+                         status_code=
+                         (exc.response.status_code
+                         if isinstance(exc, httpx.HTTPStatusError)
+                         else None),
+                         level=logging.WARNING,
+                         ),
+                     )
 
             await asyncio.sleep(delay)
 

@@ -3,6 +3,7 @@ import asyncio
 import json
 import os
 import sqlite3
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 import httpx
@@ -10,12 +11,15 @@ import yaml
 from job_hunter.collectors.ats import collect_with_diagnostics
 from job_hunter.collectors.calculate_discovery_status import calculate_discovery_status
 from job_hunter.collectors.verify_detail import verify_detail
+from job_hunter.observability import emit_log, make_log_event
+from job_hunter.discovery_log_level import discovery_log_level
 from job_hunter.evaluate import evaluate
 from job_hunter.agent import analyze
 from job_hunter.models import Job, Eligibility
 from job_hunter.describe_source_error import describe_source_error
 from job_hunter.safe_identifier import safe_identifier
 
+logger = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[2]
 
 def db_init(conn):
@@ -200,6 +204,16 @@ async def run(args):
     discovery_status = calculate_discovery_status(
         total_sources=total_sources,
         failed_sources=failed_sources,
+    )
+
+    emit_log(
+        logger,
+        make_log_event(
+            event="discovery_completed",
+            component="discovery",
+            outcome=discovery_status.value,
+            level=discovery_log_level(discovery_status),
+        ),
     )
 
     discovery_summary = {

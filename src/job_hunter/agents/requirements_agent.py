@@ -4,6 +4,7 @@ import os
 from collections.abc import Mapping
 from typing import Any
 import asyncio
+import logging
 from unicodedata import category
 
 import httpx
@@ -14,7 +15,10 @@ from job_hunter.classify_http_error import classify_http_error, FailureCategory
 from job_hunter.classify_transport_error import classify_transport_error
 from job_hunter.gemini_retry import gemini_retry_safe
 from job_hunter.model.RequirementAssessment import TechnicalAssessment
+from job_hunter.observability import emit_log, make_log_event
 from job_hunter.should_retry import should_retry
+
+logger = logging.getLogger(__name__)
 
 ASSESSMENT_INSTRUCTIONS = """ASSESSMENT INSTRUCTIONS
 1. Extract all technical requirements.
@@ -136,8 +140,34 @@ async def assess_requirements(
                         max_attempts=max_attempts,
                         retry_safe=retry_safe,
                 ):
+                    emit_log(logger,
+                         make_log_event(
+                             event="http_request_failed",
+                             component='gemini',
+                             outcome="failure",
+                             attempt=attempt,
+                             status_code=
+                             (exc.response.status_code
+                              if isinstance(exc, httpx.HTTPStatusError)
+                              else None),
+                             level=logging.ERROR,
+                         ),
+                     )
                     raise
 
+                emit_log(logger,
+                     make_log_event(
+                         event="http_retry_scheduled",
+                         component='gemini',
+                         outcome="retry",
+                         attempt=attempt,
+                         status_code=
+                         (exc.response.status_code
+                          if isinstance(exc, httpx.HTTPStatusError)
+                          else None),
+                         level=logging.WARNING,
+                     ),
+                         )
                 delay = calculate_retry_delay(
                     attempt=attempt,
                     retry_after=retry_after,

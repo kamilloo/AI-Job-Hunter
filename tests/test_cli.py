@@ -1,5 +1,7 @@
 import argparse
 import asyncio
+import json
+import logging
 from unittest.mock import AsyncMock, patch
 
 import httpx
@@ -633,3 +635,168 @@ def test_discovery_summary_complete_with_zero_jobs(tmp_path):
 
     assert "Collection failure:" not in report_text
     assert "## Job verification failures" not in report_text
+
+def test_partial_discovery_emits_warning(caplog, tmp_path):
+    args = make_discovery_args(
+        tmp_path,
+        board_slugs=["broken", "working"],
+    )
+
+    async def fake_collect(client, provider, slug, company):
+        if slug == "broken":
+            raise_http_503()
+
+        return CollectionResult(jobs=[], skipped_invalid=0)
+
+    with (
+        patch(
+            "job_hunter.cli.collect_with_diagnostics",
+            side_effect=fake_collect,
+        ),
+        caplog.at_level(
+            logging.INFO,
+            logger="job_hunter.cli",
+        ),
+    ):
+        asyncio.run(run(args))
+
+    events = [
+        json.loads(record.message)
+        for record in caplog.records
+        if record.name == "job_hunter.cli"
+        and record.message.startswith("{")
+    ]
+
+    discovery_events = [
+        event
+        for event in events
+        if event["event"] == "discovery_completed"
+    ]
+
+    assert len(discovery_events) == 1
+    assert discovery_events[0]["component"] == "discovery"
+    assert discovery_events[0]["outcome"] == "partial"
+    assert discovery_events[0]["level"] == logging.WARNING
+
+def test_complete_discovery_emits_info(caplog, tmp_path):
+    args = make_discovery_args(
+        tmp_path,
+        board_slugs=["working"],
+    )
+
+    async def fake_collect(client, provider, slug, company):
+        return CollectionResult(jobs=[], skipped_invalid=0)
+
+    with (
+        patch(
+            "job_hunter.cli.collect_with_diagnostics",
+            side_effect=fake_collect,
+        ),
+        caplog.at_level(
+            logging.INFO,
+            logger="job_hunter.cli",
+        ),
+    ):
+        asyncio.run(run(args))
+
+    events = [
+        json.loads(record.message)
+        for record in caplog.records
+        if record.name == "job_hunter.cli"
+        and record.message.startswith("{")
+    ]
+
+    discovery_events = [
+        event
+        for event in events
+        if event["event"] == "discovery_completed"
+    ]
+
+    assert len(discovery_events) == 1
+    assert discovery_events[0]["component"] == "discovery"
+    assert discovery_events[0]["outcome"] == "complete"
+    assert discovery_events[0]["level"] == logging.INFO
+
+def test_failed_discovery_emits_error(caplog, tmp_path):
+    args = make_discovery_args(
+        tmp_path,
+        board_slugs=["broken"],
+    )
+
+    async def fake_collect(client, provider, slug, company):
+        if slug == "broken":
+            raise_http_503()
+
+        return CollectionResult(jobs=[], skipped_invalid=0)
+
+    with (
+        patch(
+            "job_hunter.cli.collect_with_diagnostics",
+            side_effect=fake_collect,
+        ),
+        caplog.at_level(
+            logging.INFO,
+            logger="job_hunter.cli",
+        ),
+    ):
+        asyncio.run(run(args))
+
+    events = [
+        json.loads(record.message)
+        for record in caplog.records
+        if record.name == "job_hunter.cli"
+        and record.message.startswith("{")
+    ]
+
+    discovery_events = [
+        event
+        for event in events
+        if event["event"] == "discovery_completed"
+    ]
+
+    assert len(discovery_events) == 1
+    assert discovery_events[0]["component"] == "discovery"
+    assert discovery_events[0]["outcome"] == "failed"
+    assert discovery_events[0]["level"] == logging.ERROR
+
+
+def test_no_source_discovery_emits_warnings(caplog, tmp_path):
+    args = make_discovery_args(
+        tmp_path,
+        board_slugs=[],
+    )
+
+    async def fake_collect(client, provider, slug, company):
+        if slug == "broken":
+            raise_http_503()
+
+        return CollectionResult(jobs=[], skipped_invalid=0)
+
+    with (
+        patch(
+            "job_hunter.cli.collect_with_diagnostics",
+            side_effect=fake_collect,
+        ),
+        caplog.at_level(
+            logging.INFO,
+            logger="job_hunter.cli",
+        ),
+    ):
+        asyncio.run(run(args))
+
+    events = [
+        json.loads(record.message)
+        for record in caplog.records
+        if record.name == "job_hunter.cli"
+        and record.message.startswith("{")
+    ]
+
+    discovery_events = [
+        event
+        for event in events
+        if event["event"] == "discovery_completed"
+    ]
+
+    assert len(discovery_events) == 1
+    assert discovery_events[0]["outcome"] == "no_sources"
+    assert discovery_events[0]["level"] == logging.WARNING
