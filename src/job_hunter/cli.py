@@ -7,11 +7,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 import httpx
 import yaml
-from job_hunter.collectors.ats import collect
+from job_hunter.collectors.ats import collect_with_diagnostics
+from job_hunter.collectors.calculate_discovery_status import calculate_discovery_status
+from job_hunter.collectors.verify_detail import verify_detail
 from job_hunter.evaluate import evaluate
 from job_hunter.agent import analyze
 from job_hunter.models import Job, Eligibility
 from job_hunter.describe_source_error import describe_source_error
+from job_hunter.safe_identifier import safe_identifier
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -23,13 +26,39 @@ def save_job(conn, job):
     conn.execute('INSERT INTO jobs(key,company,title,url,last_seen) VALUES(?,?,?,?,?) ON CONFLICT(key) DO UPDATE SET last_seen=excluded.last_seen',
                  (job.key, job.company, job.title, str(job.url), datetime.now(timezone.utc).isoformat()))
 
-def report(items, errors, path, *, ai_errors=None):
+def report(
+    items,
+    errors,
+    path,
+    *,
+    ai_errors=None,
+    normalization_warnings=None,
+    verification_errors=None,
+    discovery_summary=None,
+):
     ai_errors = ai_errors or []
+    normalization_warnings = normalization_warnings or []
+    verification_errors = verification_errors or []
     by_status = {s: [] for s in Eligibility}
     for job, match in items: by_status[match.eligibility].append((job,match))
     lines = ["# Daily AI Job Hunter", "", f"Generated: {datetime.now(timezone.utc).isoformat()}",
              "", f"Jobs analyzed: {len(items)}; eligible: {len(by_status[Eligibility.eligible])}; review: {len(by_status[Eligibility.review])}; rejected: {len(by_status[Eligibility.rejected])}",
              "", "> Verification is conservative. 'Eligible' requires a successful official ATS job-detail check and explicit remote/Poland evidence. A successful ATS detail response does not guarantee the application form accepts submissions.", ""]
+
+    if discovery_summary is not None:
+        lines += [
+            "## Discovery summary",
+            "",
+            f"Status: {discovery_summary['status']}",
+            (
+                f"Sources: {discovery_summary['successful_sources']} succeeded, "
+                f"{discovery_summary['failed_sources']} failed, "
+                f"{discovery_summary['total_sources']} total"
+            ),
+            f"Jobs collected: {discovery_summary['jobs_collected']}",
+            "",
+        ]
+
     for status in (Eligibility.eligible, Eligibility.review, Eligibility.rejected):
         lines += [f"## {status.value.title()} ({len(by_status[status])})", ""]
         for job, match in sorted(by_status[status], key=lambda x: x[1].score, reverse=True)[:20]:
@@ -51,7 +80,8 @@ def report(items, errors, path, *, ai_errors=None):
 
             lines.append(
                 f"- Collection failure: "
-                f"{error['provider']}/{error['board']} — "
+                f"{safe_identifier(error['provider'])}/"
+                f"{safe_identifier(error['board'])} — "
                 f"{error['category']} ({status})"
             )
 
@@ -61,34 +91,41 @@ def report(items, errors, path, *, ai_errors=None):
         for error in ai_errors:
             lines.append(
                 f"- AI analysis failure: "
-                f"{error['job_key']} — "
+                f"{safe_identifier(error['job_key'])} — "
                 f"{error['error_type']}"
+            )
+
+    if normalization_warnings:
+        lines += ["", "## Malformed ATS records", ""]
+
+        for warning in normalization_warnings:
+            lines.append(
+                f"- {safe_identifier(warning['provider'])}/"
+                f"{safe_identifier(warning['board'])}: "
+                f"{warning['skipped_invalid']} invalid records skipped"
+            )
+
+    if verification_errors:
+        lines += ["", "## Job verification failures", ""]
+
+        for error in verification_errors:
+            status = (
+                f"HTTP {error['status_code']}"
+                if error["status_code"] is not None
+                else error["error_type"]
+            )
+
+            lines.append(
+                f"- Verification failure: "
+                f"{safe_identifier(error['provider'])}/"
+                f"{safe_identifier(error['board'])} — "
+                f"{safe_identifier(error['job_key'])} — "
+                f"{error['category']} ({status})"
             )
 
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-async def verify_detail(client, job):
-    # Only canonical job-specific ATS GET URLs establish live status; page/ATS form functionality is NOT verified.
-    endpoint = None
-    if job.provider == 'greenhouse':
-        endpoint = f'https://boards-api.greenhouse.io/v1/boards/{job.board}/jobs/{job.external_id}'
-    elif job.provider == 'lever':
-        endpoint = f'https://api.lever.co/v0/postings/{job.board}/{job.external_id}'
-    elif job.provider == 'ashby':
-        # Ashby public posting API publishes current postings; confirmation comes from the live board response,
-        # not from validating a possibly inaccessible application URL.
-        job.verified_live = True
-        job.verified_at = datetime.now(timezone.utc).isoformat()
-        return
-    if endpoint:
-        try:
-            r = await client.get(endpoint)
-            r.raise_for_status()
-            job.verified_live = True
-            job.verified_at = datetime.now(timezone.utc).isoformat()
-        except (httpx.HTTPError, ValueError):
-            pass
 
 async def run(args):
     profile = yaml.safe_load(Path(args.profile).read_text(encoding='utf-8'))
@@ -96,13 +133,22 @@ async def run(args):
     boards = cfg.get('boards', []) or []
     collection_errors = []
     ai_errors = []
+    normalization_warnings = []
+    verification_errors = []
     jobs = []
 
     async with httpx.AsyncClient(timeout=20, follow_redirects=True, headers={'User-Agent':'AIJobHunter/0.1 (personal research)'}) as client:
         for board in boards:
             try:
-                new = await collect(client, board['provider'], board['slug'], board['company'])
-                jobs.extend(new)
+                result = await collect_with_diagnostics(client, board['provider'], board['slug'], board['company'])
+                jobs.extend(result.jobs)
+
+                if result.skipped_invalid > 0:
+                    normalization_warnings.append({
+                        "provider": board["provider"],
+                        "board": board["slug"],
+                        "skipped_invalid": result.skipped_invalid,
+                    })
             except (httpx.HTTPError, KeyError, ValueError) as exc:
                 collection_errors.append(
                     describe_source_error(
@@ -113,8 +159,21 @@ async def run(args):
                 )
         unique = {job.key: job for job in jobs}
         jobs = list(unique.values())
+
+        jobs_collected = len(jobs)
         for job in jobs:
-            await verify_detail(client, job)
+            result = await verify_detail(client, job)
+
+            if not result.verified:
+                verification_errors.append({
+                    "job_key": job.key,
+                    "provider": job.provider,
+                    "board": job.board,
+                    "error_type": result.error_type,
+                    "category": result.category,
+                    "status_code": result.status_code,
+                })
+
     conn = sqlite3.connect(args.database)
     db_init(conn)
     known = {row[0]:row[1] for row in conn.execute('SELECT key,status FROM jobs')}
@@ -127,17 +186,50 @@ async def run(args):
             try:
                 match = await analyze(job, match, profile, args.model)
             except Exception as exc:
-                ai_errors.append(f"AI analysis {job.key}: {type(exc).__name__}: {exc}")
+                ai_errors.append({
+                    "job_key": job.key,
+                    "error_type": type(exc).__name__,
+                })
         save_job(conn, job)
         items.append((job, match))
     conn.commit(); conn.close()
+    total_sources = len(boards)
+    failed_sources = len(collection_errors)
+    successful_sources = total_sources - failed_sources
+
+    discovery_status = calculate_discovery_status(
+        total_sources=total_sources,
+        failed_sources=failed_sources,
+    )
+
+    discovery_summary = {
+        "status": discovery_status.value,
+        "total_sources": total_sources,
+        "successful_sources": successful_sources,
+        "failed_sources": failed_sources,
+        "jobs_collected": jobs_collected,
+    }
+
     report(
         items,
         collection_errors,
         Path(args.output),
         ai_errors=ai_errors,
+        normalization_warnings=normalization_warnings,
+        verification_errors=verification_errors,
+        discovery_summary=discovery_summary,
     )
-    print(f"Wrote {args.output}; {len(items)} results, {len(collection_errors)} warnings, {len(ai_errors)} ai warnings")
+    warning_count = (
+            len(collection_errors)
+            + len(ai_errors)
+            + len(normalization_warnings)
+            + len(verification_errors)
+    )
+
+    print(
+        f"Wrote {args.output}; "
+        f"{len(items)} results, {warning_count} warnings"
+    )
 
 def main():
     from dotenv import load_dotenv

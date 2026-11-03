@@ -1,6 +1,7 @@
 import pytest
 import httpx
-from job_hunter.collectors.ats import collect, normalize
+from job_hunter.collectors.ats import collect
+from job_hunter.collectors.normalize import normalize
 from job_hunter.evaluate import evaluate
 from job_hunter.models import Job, Eligibility
 

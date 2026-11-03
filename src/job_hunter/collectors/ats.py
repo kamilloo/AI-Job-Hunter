@@ -1,45 +1,31 @@
 import asyncio
 import re
-from html import unescape
 import httpx
-from bs4 import BeautifulSoup
 
 from job_hunter.calculate_retry_delay import calculate_retry_delay
+from job_hunter.collectors.normalize_rows import normalize_rows
+from job_hunter.collectors.normalize_rows import CollectionResult
 from job_hunter.should_retry import should_retry
 from job_hunter.classify_http_error import classify_http_error, FailureCategory
 from job_hunter.classify_transport_error import classify_transport_error
-from job_hunter.calculate_backoff import calculate_backoff
 
 from job_hunter.models import Job
 
 SLUG = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]*$")
 
-def clean_html(value: str | None) -> str:
-    return BeautifulSoup(unescape(value or ""), "html.parser").get_text(" ", strip=True)
-
-def normalize(provider: str, slug: str, company: str, payload: dict) -> Job:
-    if provider == "greenhouse":
-        return Job(provider=provider, board=slug, external_id=str(payload["id"]), company=company,
-            title=payload["title"], location=(payload.get("location") or {}).get("name", "Unknown"),
-            description=clean_html(payload.get("content")), url=payload["absolute_url"],
-            apply_url=payload["absolute_url"], updated_at=payload.get("updated_at"),
-            remote=None)
-    if provider == "ashby":
-        return Job(provider=provider, board=slug,
-            external_id=str(payload.get("id") or payload.get("jobUrl") or payload["title"]),
-            company=company, title=payload["title"], location=payload.get("location") or "Unknown",
-            description=clean_html(payload.get("descriptionHtml") or payload.get("descriptionPlain")),
-            url=payload["jobUrl"], apply_url=payload.get("applyUrl") or payload["jobUrl"],
-            remote=payload.get("isRemote"), salary_text=str(payload.get("compensation") or "") or None)
-    if provider == "lever":
-        cats = payload.get("categories") or {}
-        return Job(provider=provider, board=slug, external_id=str(payload["id"]), company=company,
-            title=payload["text"], location=cats.get("location") or "Unknown",
-            description=clean_html(payload.get("descriptionPlain") or payload.get("description") or payload.get("additionalPlain")),
-            url=payload["hostedUrl"], apply_url=payload.get("applyUrl") or payload["hostedUrl"])
-    raise ValueError(f"Unknown provider: {provider}")
 
 async def collect(client: httpx.AsyncClient, provider: str, slug: str, company: str) -> list[Job]:
+    result = await collect_with_diagnostics(
+        client, provider, slug, company
+    )
+    return result.jobs
+
+async def collect_with_diagnostics(
+    client: httpx.AsyncClient,
+    provider: str,
+    slug: str,
+    company: str,
+) -> CollectionResult:
     if not SLUG.fullmatch(slug):
         raise ValueError("Invalid board slug")
     urls = {
@@ -79,24 +65,14 @@ async def collect(client: httpx.AsyncClient, provider: str, slug: str, company: 
                 else None
             )
 
-            if category == FailureCategory.RATE_LIMITED:
-                delay = calculate_retry_delay(
-                    attempt=attempt,
-                    retry_after=retry_after,
-                )
-            else:
-                delay = calculate_backoff(attempt=attempt)
+            delay = calculate_retry_delay(
+                attempt=attempt,
+                retry_after=retry_after,
+            )
 
             await asyncio.sleep(delay)
 
     data = response.json()
     rows = data if provider == "lever" else data["jobs"]
-    results = []
-    for row in rows:
-        if provider == "ashby" and row.get("isListed") is False:
-            continue
-        try:
-            results.append(normalize(provider, slug, company, row))
-        except (KeyError, ValueError):
-            continue
-    return results
+
+    return normalize_rows(provider, slug, company, rows)
