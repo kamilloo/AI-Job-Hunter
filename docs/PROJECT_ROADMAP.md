@@ -241,21 +241,53 @@ python -m evaluations.compare_reports <baseline-report.json> <current-report.jso
 
 ### Milestone 6 — Operational Reliability
 
-**Status: Planned**
+**Status: In progress — Tasks 6.1–6.4 implemented, tested, and pushed to master; Tasks 6.5–6.6 planned.**
 
-**Goal:** Make the application robust under realistic API and model failures.
+**Goal:** Make job discovery and AI technical assessment resilient to realistic provider failures while preserving conservative eligibility, useful partial results, and safe operational diagnostics.
 
-**Planned scope:**
-- Timeouts, retries, and backoff.
-- API rate-limit handling.
-- Structured logging and diagnostics.
-- Safe handling of credentials.
-- Explicit error and partial-failure states.
-- Repeatable offline regression tests.
-- CI checks.
-- Cost and latency reporting for LLM requests.
+**Task 6.1 — Failure classification (completed)**
+- Classify HTTP responses and transport exceptions as transient, permanent, or rate-limited.
+- Separate failure classification from operation-specific retry eligibility.
 
-**Completion criteria:** Expected provider failures do not silently corrupt recommendations, leak sensitive data, or prevent useful partial results where appropriate.
+**Task 6.2 — Bounded retries, backoff, and rate limits (completed)**
+- Add reusable retry decisions, bounded exponential backoff, and numeric `Retry-After` handling.
+- Retry ATS GET collection operations for up to three total attempts, subject to failure classification.
+- Retry Gemini generation requests for up to two total attempts; permit selected HTTP failures and connection-establishment failures, but avoid automatic retry after ambiguous read/write timeouts and interrupted responses.
+- Preserve final exceptions and avoid retrying malformed Gemini structured output.
+- Cover recovery, permanent failures, rate limits, and retry exhaustion with offline tests.
+
+**Task 6.3 — Partial failure recovery (completed)**
+- Isolate ATS source failures so successful boards still contribute results.
+- Expose structured source failures without raw exception messages.
+- Count malformed job records and exclude deliberately unlisted Ashby postings without treating them as malformed.
+- Return explicit job-detail verification outcomes and clear stale verification state after failures.
+- Report collection, normalization, verification, and AI-analysis issues separately; sanitize diagnostic identifiers to prevent Markdown heading injection.
+- Summarize discovery as `complete`, `partial`, `failed`, or `no_sources` based on source outcomes, not job counts.
+- Preserve the legacy `collect()` list-returning interface alongside diagnostic collection results.
+
+**Task 6.4 — Structured observability (completed)**
+- Introduce a validated structured log-event model and Python logging adapter emitting JSON messages.
+- Log scheduled retries and terminal HTTP/transport failures for ATS and Gemini with attempt numbers, HTTP status codes when available, and appropriate severity.
+- Emit one discovery-outcome log event with a status-specific severity level.
+- Verify logging behavior and exclusion of sensitive payloads, candidate context, API keys, URLs, and raw errors through offline tests.
+
+**Task 6.5 — Cost and latency tracking (planned)**
+- Measure external-request latency using deterministic, testable timing boundaries.
+- Capture Gemini provider usage metadata when available.
+- Distinguish observed tokens/usage from estimated currency cost; avoid recording sensitive prompts or candidate data.
+
+**Task 6.6 — CI checks (planned)**
+- Run the offline test suite automatically without live provider calls or secrets.
+- Add repeatable checks for code quality and test regressions.
+
+**Remaining limitations and follow-up**
+- Gemini retries do not guarantee exactly-once generation or billing; failures can occur after server-side processing.
+- Numeric `Retry-After` values are capped by the current delay policy, which may retry earlier than a provider requests; improve wait-budget handling before claiming full rate-limit compliance.
+- HTTP retry/failure events do not cover every parsing, schema-validation, or unexpected application error.
+- Latency, token usage, monetary cost reporting, and CI automation have not yet been completed.
+- The legacy `job-hunter --ai` route remains separate from the focused Gemini requirements assessor and still needs verification.
+
+**Completion criteria:** Expected provider failures should not silently corrupt eligibility decisions, expose sensitive diagnostics, or block useful partial results. Milestone 6 is complete only after cost/latency visibility and CI checks are implemented and verified.
 
 ### Milestone 7 — Portfolio Readiness
 
@@ -289,8 +321,8 @@ The project will be considered successful when:
 
 ## 7. Current Priorities
 
-1. Begin Milestone 6 by auditing external ATS and Gemini failure handling, timeouts, rate limits, retries and partial-result behavior.
-2. Add safe structured diagnostics, request cost/latency measurement and CI verification without exposing credentials.
+1. Complete Milestone 6.5 with testable request-latency measurement, Gemini usage metadata, and clearly labeled cost estimates.
+2. Complete Milestone 6.6 with automated offline CI checks that do not require API credentials or paid model calls.
 3. Resolve verified candidate-profile inconsistencies (including Docker production experience).
 4. Keep curated regression fixtures and evaluation methodology current as new failure cases appear; avoid interpreting tiny in-sample pass rates as general accuracy.
 5. Prepare Milestone 7 architecture documentation, a reproducible end-to-end demonstration, and a clear explanation of the legacy CLI AI path versus the separate technical assessor.
