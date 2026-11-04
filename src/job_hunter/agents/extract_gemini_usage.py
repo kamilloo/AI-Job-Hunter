@@ -20,4 +20,6 @@ def extract_gemini_usage(
         prompt_tokens=metadata["promptTokenCount"],
         output_tokens=metadata["candidatesTokenCount"],
         total_tokens=metadata["totalTokenCount"],
+        thinking_tokens=metadata.get("thoughtsTokenCount"),
+        cached_input_tokens=metadata.get("cachedContentTokenCount"),
     )

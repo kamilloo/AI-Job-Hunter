@@ -9,3 +9,11 @@ class GeminiUsage(BaseModel):
     prompt_tokens: int = Field(ge=0)
     output_tokens: int = Field(ge=0)
     total_tokens: int = Field(ge=0)
+
+    thinking_tokens: int | None = Field(
+        default=None, ge=0, strict=True
+    )
+
+    cached_input_tokens: int | None = Field(
+        default=None, ge=0, strict=True
+    )
