@@ -9,6 +9,7 @@ def make_log_event(
     outcome: str,
     attempt: int | None = None,
     status_code: int | None = None,
+    duration_ms: float | None = None,
     level: int = logging.INFO,
 ) -> Log:
     return Log(
@@ -17,6 +18,7 @@ def make_log_event(
         component=component,
         attempt=attempt,
         status_code=status_code,
+        duration_ms=duration_ms,
         level=level,
     )
 

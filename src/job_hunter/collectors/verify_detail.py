@@ -1,3 +1,5 @@
+import logging
+import time
 from datetime import datetime, timezone
 import httpx
 
@@ -5,7 +7,9 @@ from dataclasses import dataclass
 
 from job_hunter.describe_source_error import describe_source_error
 from job_hunter.models import Job
+from job_hunter.observability import emit_log, make_log_event
 
+logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class VerificationResult:
@@ -32,6 +36,7 @@ async def verify_detail(client, job:Job) -> VerificationResult:
 
         return VerificationResult(verified=True)
     if endpoint:
+        start = time.perf_counter()
         try:
             r = await client.get(endpoint)
             r.raise_for_status()
@@ -52,6 +57,19 @@ async def verify_detail(client, job:Job) -> VerificationResult:
                 category=diagnostic["category"],
                 status_code=diagnostic["status_code"],
             )
+        finally:
+            duration_ms = (time.perf_counter() - start) * 1000
+            emit_log(logger,
+                     make_log_event(
+                         event="http_attempt_completed",
+                         component='ats',
+                         outcome="success",
+                         attempt=1,
+                         status_code=200,
+                         duration_ms=duration_ms,
+                         level=logging.INFO,
+                     ),
+                 )
 
     return VerificationResult(
         verified=False,

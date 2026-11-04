@@ -21,3 +21,7 @@ class Log(BaseModel):
         logging.ERROR,
         logging.CRITICAL,
     ] = logging.INFO
+
+    duration_ms: float | None = Field(
+        default=None, ge=0,allow_inf_nan=False
+    )

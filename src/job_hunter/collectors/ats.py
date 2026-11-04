@@ -2,10 +2,11 @@ import asyncio
 import re
 import httpx
 import logging
-
+from time import perf_counter
 from job_hunter.calculate_retry_delay import calculate_retry_delay
 from job_hunter.collectors.normalize_rows import normalize_rows
 from job_hunter.collectors.normalize_rows import CollectionResult
+from job_hunter.latency.elapsed_ms import elapsed_ms
 from job_hunter.observability import make_log_event, emit_log
 from job_hunter.should_retry import should_retry
 from job_hunter.classify_http_error import classify_http_error, FailureCategory
@@ -43,9 +44,37 @@ async def collect_with_diagnostics(
     max_attempts = 3
 
     for attempt in range(1, max_attempts + 1):
+        start = perf_counter()
+        status_code = None
+        outcome = "failure"
         try:
-            response = await client.get(endpoint, params=params)
-            response.raise_for_status()
+            try:
+                response = await client.get(endpoint, params=params)
+                status_code = response.status_code
+                response.raise_for_status()
+                outcome = "success"
+
+            finally:
+                emit_log(
+                    logger,
+                    make_log_event(
+                        event="http_attempt_completed",
+                        component="ats",
+                        outcome=outcome,
+                        attempt=attempt,
+                        status_code=status_code,
+                        duration_ms=elapsed_ms(
+                            start,
+                            perf_counter(),
+                        ),
+                        level=(
+                            logging.INFO
+                            if outcome == "success"
+                            else logging.WARNING
+                        ),
+                    ),
+                )
+
             break
         except httpx.HTTPError as exc:
             if isinstance(exc, httpx.HTTPStatusError):

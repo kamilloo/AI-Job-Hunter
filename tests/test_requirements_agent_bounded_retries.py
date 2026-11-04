@@ -321,9 +321,9 @@ def test_gemini_retry_emits_structured_warning(caplog):
     ]
 
     assert len(requests) == 2
-    assert len(retry_events) == 1
+    assert len(retry_events) == 2
 
-    event = retry_events[0]
+    event = retry_events[1]
 
     assert event["event"] == "http_retry_scheduled"
     assert event["component"] == "gemini"

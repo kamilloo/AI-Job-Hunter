@@ -8,12 +8,14 @@ import logging
 from unicodedata import category
 
 import httpx
+from time import perf_counter
 
 from job_hunter.calculate_backoff import calculate_backoff
 from job_hunter.calculate_retry_delay import calculate_retry_delay
 from job_hunter.classify_http_error import classify_http_error, FailureCategory
 from job_hunter.classify_transport_error import classify_transport_error
 from job_hunter.gemini_retry import gemini_retry_safe
+from job_hunter.latency.elapsed_ms import elapsed_ms
 from job_hunter.model.RequirementAssessment import TechnicalAssessment
 from job_hunter.observability import emit_log, make_log_event
 from job_hunter.should_retry import should_retry
@@ -110,14 +112,43 @@ async def assess_requirements(
     async def request(http_client: httpx.AsyncClient) -> TechnicalAssessment:
         max_attempts = 2
         for attempt in range(1, max_attempts + 1):
+            start = perf_counter()
+            status_code = None
+            outcome = "failure"
+
             try:
-                response = await http_client.post(
-                    f"https://generativelanguage.googleapis.com/v1beta/models/{selected_model}:generateContent",
-                    headers={"x-goog-api-key": key},
-                    json=payload,
-                    timeout=60,
-                )
-                response.raise_for_status()
+                try:
+                    response = await http_client.post(
+                        f"https://generativelanguage.googleapis.com/v1beta/models/{selected_model}:generateContent",
+                        headers={"x-goog-api-key": key},
+                        json=payload,
+                        timeout=60,
+                    )
+                    status_code = response.status_code
+                    response.raise_for_status()
+                    outcome = "success"
+
+                finally:
+                    emit_log(
+                        logger,
+                        make_log_event(
+                            event="http_attempt_completed",
+                            component="gemini",
+                            outcome=outcome,
+                            attempt=attempt,
+                            status_code=status_code,
+                            duration_ms=elapsed_ms(
+                                start,
+                                perf_counter(),
+                            ),
+                            level=(
+                                logging.INFO
+                                if outcome == "success"
+                                else logging.WARNING
+                            ),
+                        ),
+                    )
+
                 break
             except httpx.HTTPError as exc:
                 if isinstance(exc, httpx.HTTPStatusError):
