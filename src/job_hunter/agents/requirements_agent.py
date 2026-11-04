@@ -10,6 +10,9 @@ from unicodedata import category
 import httpx
 from time import perf_counter
 
+from pydantic import ValidationError
+
+from job_hunter.agents.extract_gemini_usage import extract_gemini_usage
 from job_hunter.calculate_backoff import calculate_backoff
 from job_hunter.calculate_retry_delay import calculate_retry_delay
 from job_hunter.classify_http_error import classify_http_error, FailureCategory
@@ -113,130 +116,192 @@ async def assess_requirements(
         operation_start = perf_counter()
         operation_outcome = "failure"
         max_attempts = 2
+
         try:
-         for attempt in range(1, max_attempts + 1):
-            start = perf_counter()
-            status_code = None
-            outcome = "failure"
+            for attempt in range(1, max_attempts + 1):
+                start = perf_counter()
+                status_code = None
+                outcome = "failure"
 
-            try:
                 try:
-                    response = await http_client.post(
-                        f"https://generativelanguage.googleapis.com/v1beta/models/{selected_model}:generateContent",
-                        headers={"x-goog-api-key": key},
-                        json=payload,
-                        timeout=60,
-                    )
-                    status_code = response.status_code
-                    response.raise_for_status()
-                    outcome = "success"
-                    operation_outcome = "success"
+                    try:
+                        response = await http_client.post(
+                            f"https://generativelanguage.googleapis.com/v1beta/models/{selected_model}:generateContent",
+                            headers={"x-goog-api-key": key},
+                            json=payload,
+                            timeout=60,
+                        )
 
-                finally:
+                        status_code = response.status_code
+                        response.raise_for_status()
+                        outcome = "success"
+
+                    finally:
+                        emit_log(
+                            logger,
+                            make_log_event(
+                                event="http_attempt_completed",
+                                component="gemini",
+                                outcome=outcome,
+                                attempt=attempt,
+                                status_code=status_code,
+                                duration_ms=elapsed_ms(
+                                    start,
+                                    perf_counter(),
+                                ),
+                                level=(
+                                    logging.INFO
+                                    if outcome == "success"
+                                    else logging.WARNING
+                                ),
+                            ),
+                        )
+
+                    break
+
+                except httpx.HTTPError as exc:
+                    if isinstance(exc, httpx.HTTPStatusError):
+                        category = classify_http_error(
+                            exc.response.status_code
+                        )
+                        retry_safe = True
+
+                        retry_after = (
+                            exc.response.headers.get("Retry-After")
+                            if category == FailureCategory.RATE_LIMITED
+                            else None
+                        )
+                    else:
+                        category = classify_transport_error(exc)
+                        retry_safe = gemini_retry_safe(exc)
+                        retry_after = None
+
+                    if not should_retry(
+                            category=category,
+                            attempt=attempt,
+                            max_attempts=max_attempts,
+                            retry_safe=retry_safe,
+                    ):
+                        emit_log(
+                            logger,
+                            make_log_event(
+                                event="http_request_failed",
+                                component="gemini",
+                                outcome="failure",
+                                attempt=attempt,
+                                status_code=(
+                                    exc.response.status_code
+                                    if isinstance(exc, httpx.HTTPStatusError)
+                                    else None
+                                ),
+                                level=logging.ERROR,
+                            ),
+                        )
+                        raise
+
                     emit_log(
                         logger,
                         make_log_event(
-                            event="http_attempt_completed",
+                            event="http_retry_scheduled",
                             component="gemini",
-                            outcome=outcome,
+                            outcome="retry",
                             attempt=attempt,
-                            status_code=status_code,
-                            duration_ms=elapsed_ms(
-                                start,
-                                perf_counter(),
+                            status_code=(
+                                exc.response.status_code
+                                if isinstance(exc, httpx.HTTPStatusError)
+                                else None
                             ),
-                            level=(
-                                logging.INFO
-                                if outcome == "success"
-                                else logging.WARNING
-                            ),
+                            level=logging.WARNING,
                         ),
                     )
 
-                break
-            except httpx.HTTPError as exc:
-                if isinstance(exc, httpx.HTTPStatusError):
-                    category = classify_http_error(exc.response.status_code)
-                    retry_safe = True
-
-                    retry_after = (
-                        exc.response.headers.get("Retry-After")
-                        if category == FailureCategory.RATE_LIMITED
-                        else None
-                    )
-                else:
-                    category = classify_transport_error(exc)
-                    retry_safe = gemini_retry_safe(exc)
-                    retry_after = None
-
-                if not should_retry(
-                        category=category,
+                    delay = calculate_retry_delay(
                         attempt=attempt,
-                        max_attempts=max_attempts,
-                        retry_safe=retry_safe,
-                ):
-                    emit_log(logger,
-                         make_log_event(
-                             event="http_request_failed",
-                             component='gemini',
-                             outcome="failure",
-                             attempt=attempt,
-                             status_code=
-                             (exc.response.status_code
-                              if isinstance(exc, httpx.HTTPStatusError)
-                              else None),
-                             level=logging.ERROR,
-                         ),
-                     )
-                    raise
+                        retry_after=retry_after,
+                    )
 
-                emit_log(logger,
-                     make_log_event(
-                         event="http_retry_scheduled",
-                         component='gemini',
-                         outcome="retry",
-                         attempt=attempt,
-                         status_code=
-                         (exc.response.status_code
-                          if isinstance(exc, httpx.HTTPStatusError)
-                          else None),
-                         level=logging.WARNING,
-                     ),
-                         )
-                delay = calculate_retry_delay(
-                    attempt=attempt,
-                    retry_after=retry_after,
+                    await asyncio.sleep(delay)
+
+            # HTTP succeeded. Usage can be reported even if
+            # the technical assessment later fails validation.
+            response_data = response.json()
+
+            try:
+                usage = extract_gemini_usage(
+                    response_data.get("usageMetadata")
+                )
+            except ValidationError:
+                usage = None
+
+            if usage is not None:
+                emit_log(
+                    logger,
+                    make_log_event(
+                        event="gemini_usage_reported",
+                        component="gemini",
+                        outcome="success",
+                        prompt_tokens=usage.prompt_tokens,
+                        output_tokens=usage.output_tokens,
+                        total_tokens=usage.total_tokens,
+                        level=logging.INFO,
+                    ),
                 )
 
-                await asyncio.sleep(delay)
+            # Preserve the existing response validation.
+            candidates = response_data.get("candidates", [])
+
+            if (
+                    not candidates
+                    or candidates[0].get("finishReason") != "STOP"
+            ):
+                raise ValueError(
+                    "Gemini did not return a completed "
+                    "requirements assessment"
+                )
+
+            parts = candidates[0].get(
+                "content", {}
+            ).get("parts", [])
+
+            result = "".join(
+                part.get("text", "")
+                for part in parts
+                if not part.get("thought")
+            )
+
+            if not result.strip():
+                raise ValueError(
+                    "Gemini returned an empty requirements assessment"
+                )
+
+            assessment = TechnicalAssessment.model_validate_json(
+                result
+            )
+
+            # Only a validated assessment completes successfully.
+            operation_outcome = "success"
+            return assessment
 
         finally:
-            emit_log(logger,
-                     make_log_event(
-                         event="operation_completed",
-                         component='gemini',
-                         outcome=operation_outcome,
-                         duration_ms=elapsed_ms(
-                             operation_start,
-                             perf_counter(),
-                         ),
-                         level=(
-                             logging.INFO
-                             if operation_outcome == "success"
-                             else logging.ERROR
-                         ),
-                     ),
-                 )
-
-
-        candidates = response.json().get("candidates", [])
-        if not candidates or candidates[0].get("finishReason") != "STOP":
-            raise ValueError("Gemini did not return a completed requirements assessment")
-        parts = candidates[0].get("content", {}).get("parts", [])
-        result = "".join(part.get("text", "") for part in parts if not part.get("thought"))
-        if not result.strip():
-            raise ValueError("Gemini returned an empty requirements assessment")
-        return TechnicalAssessment.model_validate_json(result)
+            # Covers HTTP errors, retries, parsing errors,
+            # and TechnicalAssessment validation failures.
+            emit_log(
+                logger,
+                make_log_event(
+                    event="operation_completed",
+                    component="gemini",
+                    outcome=operation_outcome,
+                    duration_ms=elapsed_ms(
+                        operation_start,
+                        perf_counter(),
+                    ),
+                    level=(
+                        logging.INFO
+                        if operation_outcome == "success"
+                        else logging.ERROR
+                    ),
+                ),
+            )
 
     if client is not None:
         return await request(client)

@@ -25,3 +25,8 @@ class Log(BaseModel):
     duration_ms: float | None = Field(
         default=None, ge=0,allow_inf_nan=False
     )
+
+    # LLM Usage Logging
+    prompt_tokens: int | None = Field(default=None, ge=0, strict=True)
+    output_tokens: int | None = Field(default=None, ge=0, strict=True)
+    total_tokens: int | None = Field(default=None, ge=0, strict=True)
