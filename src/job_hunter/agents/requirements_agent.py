@@ -110,8 +110,11 @@ async def assess_requirements(
     }
 
     async def request(http_client: httpx.AsyncClient) -> TechnicalAssessment:
+        operation_start = perf_counter()
+        operation_outcome = "failure"
         max_attempts = 2
-        for attempt in range(1, max_attempts + 1):
+        try:
+         for attempt in range(1, max_attempts + 1):
             start = perf_counter()
             status_code = None
             outcome = "failure"
@@ -127,6 +130,7 @@ async def assess_requirements(
                     status_code = response.status_code
                     response.raise_for_status()
                     outcome = "success"
+                    operation_outcome = "success"
 
                 finally:
                     emit_log(
@@ -205,6 +209,25 @@ async def assess_requirements(
                 )
 
                 await asyncio.sleep(delay)
+
+        finally:
+            emit_log(logger,
+                     make_log_event(
+                         event="operation_completed",
+                         component='gemini',
+                         outcome=operation_outcome,
+                         duration_ms=elapsed_ms(
+                             operation_start,
+                             perf_counter(),
+                         ),
+                         level=(
+                             logging.INFO
+                             if operation_outcome == "success"
+                             else logging.ERROR
+                         ),
+                     ),
+                 )
+
 
         candidates = response.json().get("candidates", [])
         if not candidates or candidates[0].get("finishReason") != "STOP":

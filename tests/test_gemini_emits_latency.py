@@ -73,7 +73,7 @@ def test_gemini_success_emits_attempt_latency(caplog):
     with (
         patch(
             "job_hunter.agents.requirements_agent.perf_counter",
-            side_effect=[10.0, 10.125],
+            side_effect=[10.0, 10.0, 10.125, 10.125],
         ) as mock_clock,
         caplog.at_level(logging.INFO, logger="job_hunter.agents.requirements_agent"),
     ):
@@ -86,7 +86,7 @@ def test_gemini_success_emits_attempt_latency(caplog):
         "Insufficient evidence for technical assessment."
     )
     assert len(requests) == 1
-    assert mock_clock.call_count == 2
+    assert mock_clock.call_count == 4
 
     assert latency_events == [
         {
@@ -134,8 +134,10 @@ def test_gemini_http_503_recovery_emits_attempt_latency(caplog):
         patch(
             "job_hunter.agents.requirements_agent.perf_counter",
             side_effect=[
+                10.0,         # Operation start
                 10.0, 10.125,  # Attempt 1: 125 ms
                 20.0, 20.250,  # Attempt 2: 250 ms
+                20.250,       # Operation end
             ],
         ) as mock_clock,
         patch(
@@ -153,7 +155,7 @@ def test_gemini_http_503_recovery_emits_attempt_latency(caplog):
 
     assert result.confidence == pytest.approx(0.5)
     assert len(requests) == 2
-    assert mock_clock.call_count == 4
+    assert mock_clock.call_count == 6
     mock_sleep.assert_awaited_once_with(1.0)
 
     assert len(latency_events) == 2
@@ -231,7 +233,7 @@ def test_gemini_read_timeout_emits_attempt_latency(caplog):
     with (
         patch(
             "job_hunter.agents.requirements_agent.perf_counter",
-            side_effect=[10.0, 10.125],
+            side_effect=[10.0, 10.0, 10.125, 10.125],
         ) as mock_clock,
         patch(
             "job_hunter.agents.requirements_agent.asyncio.sleep",
@@ -247,7 +249,7 @@ def test_gemini_read_timeout_emits_attempt_latency(caplog):
     failures = events_named(events, "http_request_failed")
 
     assert len(requests) == 1
-    assert mock_clock.call_count == 2
+    assert mock_clock.call_count == 4
     mock_sleep.assert_not_awaited()
 
     assert len(latency_events) == 1

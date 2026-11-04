@@ -351,10 +351,10 @@ def test_ats_success_emits_attempt_latency(caplog):
             logger="job_hunter.collectors.ats",
         ),
     ):
-        mock_time.side_effect = [10.0, 10.125]
+        mock_time.side_effect = [10.0, 10.0, 10.125, 11.125]
         asyncio.run(scenario())
 
-    assert mock_time.call_count == 2
+    assert mock_time.call_count == 4
 
     events = [
         json.loads(record.message)
@@ -401,7 +401,7 @@ def test_ats_failure_emits_attempt_latency(caplog):
     with (
         patch(
             "job_hunter.collectors.ats.perf_counter",
-            side_effect=[10.0, 10.125, 20.0, 20.125],
+            side_effect=[10.0, 10.0, 10.125, 20.0, 20.125, 20.125],
         ) as mock_clock,
         patch(
             "job_hunter.collectors.ats.asyncio.sleep",
@@ -437,7 +437,7 @@ def test_ats_failure_emits_attempt_latency(caplog):
     ]
 
     assert len(requests) == 2
-    assert mock_clock.call_count == 4
+    assert mock_clock.call_count == 6
     mock_sleep.assert_awaited_once_with(1.0)
 
     assert len(latency_events) == 2
@@ -486,9 +486,11 @@ def test_ats_transport_error_emits_latency(caplog):
         patch(
             "job_hunter.collectors.ats.perf_counter",
             side_effect=[
-                10.0, 10.100,  # Attempt 1: 100 ms
-                20.0, 20.200,  # Attempt 2: 200 ms
-                30.0, 30.300,  # Attempt 3: 300 ms
+                10.0,  # Operation start
+                10.0, 10.100,  # Attempt 1
+                20.0, 20.200,  # Attempt 2
+                30.0, 30.300,  # Attempt 3
+                30.300,  # Operation end
             ],
         ) as mock_clock,
         patch(
@@ -529,7 +531,7 @@ def test_ats_transport_error_emits_latency(caplog):
 
     # Three failed requests exhaust the ATS retry policy.
     assert len(requests) == 3
-    assert mock_clock.call_count == 6
+    assert mock_clock.call_count == 8
 
     # Backoff occurs only between attempts.
     assert mock_sleep.await_count == 2
@@ -581,3 +583,227 @@ def test_ats_transport_error_emits_latency(caplog):
 
     # Sensitive exception messages must not enter structured logs.
     assert "response timed out" not in caplog.text
+
+
+def test_ats_emits_operation_latency(caplog):
+        requests = []
+
+        def handler(request):
+            requests.append(request)
+            status_code = 503 if len(requests) == 1 else 200
+
+            return httpx.Response(
+                status_code,
+                json={"jobs": []} if status_code == 200 else {},
+            )
+
+        async def scenario():
+            async with httpx.AsyncClient(
+                    transport=httpx.MockTransport(handler)
+            ) as client:
+                await collect(
+                    client,
+                    provider="greenhouse",
+                    slug="example",
+                    company="Example",
+                )
+
+        with (
+            patch(
+                "job_hunter.collectors.ats.perf_counter",
+                side_effect=[
+                    10.000,  # Operation start
+                    10.000,  # Attempt 1 start
+                    10.125,  # Attempt 1 end: 125 ms
+                    11.125,  # Attempt 2 start: 1-second backoff
+                    11.375,  # Attempt 2 end: 250 ms
+                    11.400,  # Operation end: 25 ms processing
+                ],
+            ) as mock_clock,
+            patch(
+                "job_hunter.collectors.ats.asyncio.sleep",
+                new_callable=AsyncMock,
+            ) as mock_sleep,
+            caplog.at_level(
+                logging.INFO,
+                logger="job_hunter.collectors.ats",
+            ),
+        ):
+            asyncio.run(scenario())
+
+        events = [
+            json.loads(record.message)
+            for record in caplog.records
+            if record.name == "job_hunter.collectors.ats"
+               and record.message.startswith("{")
+        ]
+
+        attempt_events = [
+            event for event in events
+            if event["event"] == "http_attempt_completed"
+        ]
+
+        operation_events = [
+            event for event in events
+            if event["event"] == "operation_completed"
+        ]
+
+        retry_events = [
+            event for event in events
+            if event["event"] == "http_retry_scheduled"
+        ]
+
+        assert len(requests) == 2
+        assert mock_clock.call_count == 6
+        mock_sleep.assert_awaited_once_with(1.0)
+
+        assert len(attempt_events) == 2
+        assert len(retry_events) == 1
+        assert len(operation_events) == 1
+
+        assert attempt_events[0]["duration_ms"] == pytest.approx(125.0)
+        assert attempt_events[1]["duration_ms"] == pytest.approx(250.0)
+
+        assert operation_events[0]["component"] == "ats"
+        assert operation_events[0]["outcome"] == "success"
+        assert operation_events[0]["duration_ms"] == pytest.approx(1400.0)
+        assert operation_events[0]["level"] == logging.INFO
+
+
+def test_ats_retry_exhaustion_emits_operation_latency(caplog):
+    requests = []
+
+    def handler(request):
+        requests.append(request)
+        return httpx.Response(
+            503,
+            json={"error": "secret-response-content"},
+        )
+
+    async def scenario():
+        async with httpx.AsyncClient(
+            transport=httpx.MockTransport(handler)
+        ) as client:
+            with pytest.raises(httpx.HTTPStatusError) as exc_info:
+                await collect(
+                    client,
+                    provider="greenhouse",
+                    slug="example",
+                    company="Example",
+                )
+
+            assert exc_info.value.response.status_code == 503
+            assert exc_info.value.request is requests[-1]
+
+    with (
+        patch(
+            "job_hunter.collectors.ats.perf_counter",
+            side_effect=[
+                10.000,  # Operation start
+                10.000,  # Attempt 1 start
+                10.125,  # Attempt 1 end: 125 ms
+                11.125,  # Attempt 2 start: 1-second backoff
+                11.325,  # Attempt 2 end: 200 ms
+                13.325,  # Attempt 3 start: 2-second backoff
+                13.625,  # Attempt 3 end: 300 ms
+                13.625,  # Operation end
+            ],
+        ) as mock_clock,
+        patch(
+            "job_hunter.collectors.ats.asyncio.sleep",
+            new_callable=AsyncMock,
+        ) as mock_sleep,
+        caplog.at_level(
+            logging.INFO,
+            logger="job_hunter.collectors.ats",
+        ),
+    ):
+        asyncio.run(scenario())
+
+    events = [
+        json.loads(record.message)
+        for record in caplog.records
+        if record.name == "job_hunter.collectors.ats"
+        and record.message.startswith("{")
+    ]
+
+    attempt_events = [
+        event for event in events
+        if event["event"] == "http_attempt_completed"
+    ]
+
+    retry_events = [
+        event for event in events
+        if event["event"] == "http_retry_scheduled"
+    ]
+
+    terminal_events = [
+        event for event in events
+        if event["event"] == "http_request_failed"
+    ]
+
+    operation_events = [
+        event for event in events
+        if event["event"] == "operation_completed"
+    ]
+
+    # ATS uses three total attempts.
+    assert len(requests) == 3
+    assert mock_clock.call_count == 8
+
+    # Two retry delays: 1 second, then 2 seconds.
+    assert mock_sleep.await_args_list == [
+        call(1.0),
+        call(2.0),
+    ]
+
+    # Three individual request measurements.
+    assert len(attempt_events) == 3
+
+    assert [event["attempt"] for event in attempt_events] == [
+        1, 2, 3
+    ]
+    assert [event["status_code"] for event in attempt_events] == [
+        503, 503, 503
+    ]
+    assert [event["outcome"] for event in attempt_events] == [
+        "failure", "failure", "failure"
+    ]
+
+    for event, duration in zip(
+        attempt_events,
+        [125.0, 200.0, 300.0],
+    ):
+        assert event["duration_ms"] == pytest.approx(duration)
+        assert event["level"] == logging.WARNING
+
+    # Exactly two scheduled retries.
+    assert len(retry_events) == 2
+    assert [event["attempt"] for event in retry_events] == [1, 2]
+
+    # Only the final attempt emits a terminal failure event.
+    assert terminal_events == [
+        {
+            "event": "http_request_failed",
+            "component": "ats",
+            "outcome": "failure",
+            "attempt": 3,
+            "status_code": 503,
+            "level": logging.ERROR,
+        }
+    ]
+
+    # Exactly one failed operation event.
+    assert len(operation_events) == 1
+
+    operation = operation_events[0]
+
+    assert operation["component"] == "ats"
+    assert operation["outcome"] == "failure"
+    assert operation["level"] == logging.ERROR
+    assert operation["duration_ms"] == pytest.approx(3625.0)
+
+    # Do not leak API responses or request URLs.
+    assert "secret-response-content" not in caplog.text
+    assert str(requests[0].url) not in caplog.text
+

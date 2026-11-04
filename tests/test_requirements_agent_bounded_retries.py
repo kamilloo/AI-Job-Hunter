@@ -508,7 +508,14 @@ def test_gemini_terminal_failure_events(
     if status_code is not None:
         expected_failure["status_code"] = status_code
     assert failures == [expected_failure]
-    assert events[-1] == expected_failure
+    operations = [event for event in events if event["event"] == "operation_completed"]
+    assert len(operations) == 1
+    operation = operations[0]
+    assert events[-1] == operation
+    assert operation["component"] == "gemini"
+    assert operation["outcome"] == "failure"
+    assert operation["level"] == logging.ERROR
+    assert operation["duration_ms"] >= 0
     assert records[-1].levelno == logging.ERROR
     if retries:
         assert retries == [{

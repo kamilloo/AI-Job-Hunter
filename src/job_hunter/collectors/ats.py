@@ -42,8 +42,10 @@ async def collect_with_diagnostics(
     endpoint, params = urls[provider]
 
     max_attempts = 3
-
-    for attempt in range(1, max_attempts + 1):
+    start_operation = perf_counter()
+    operation_outcome = "failure"
+    try:
+      for attempt in range(1, max_attempts + 1):
         start = perf_counter()
         status_code = None
         outcome = "failure"
@@ -132,6 +134,24 @@ async def collect_with_diagnostics(
 
             await asyncio.sleep(delay)
 
+      operation_outcome = "success"
+    finally:
+        emit_log(logger,
+                 make_log_event(
+                     event="operation_completed",
+                     component='ats',
+                     outcome=operation_outcome,
+                     duration_ms=elapsed_ms(
+                         start_operation,
+                         perf_counter(),
+                     ),
+                     level=(
+                         logging.INFO
+                         if operation_outcome == "success"
+                         else logging.ERROR
+                     ),
+                 ),
+                 )
     data = response.json()
     rows = data if provider == "lever" else data["jobs"]
 
