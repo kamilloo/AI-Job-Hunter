@@ -241,7 +241,7 @@ python -m evaluations.compare_reports <baseline-report.json> <current-report.jso
 
 ### Milestone 6 — Operational Reliability
 
-**Status: In progress — Tasks 6.1–6.4 implemented, tested, and pushed to master; Tasks 6.5–6.6 planned.**
+**Status: Completed — Tasks 6.1–6.5 implemented and tested; existing GitHub Actions CI confirmed for push and pull-request checks.**
 
 **Goal:** Make job discovery and AI technical assessment resilient to realistic provider failures while preserving conservative eligibility, useful partial results, and safe operational diagnostics.
 
@@ -271,23 +271,33 @@ python -m evaluations.compare_reports <baseline-report.json> <current-report.jso
 - Emit one discovery-outcome log event with a status-specific severity level.
 - Verify logging behavior and exclusion of sensitive payloads, candidate context, API keys, URLs, and raw errors through offline tests.
 
-**Task 6.5 — Cost and latency tracking (planned)**
-- Measure external-request latency using deterministic, testable timing boundaries.
-- Capture Gemini provider usage metadata when available.
-- Distinguish observed tokens/usage from estimated currency cost; avoid recording sensitive prompts or candidate data.
+**Task 6.5 — Cost, latency, and operational reporting (completed)**
+- Measure each ATS and Gemini HTTP attempt, including failures, using deterministic, testable timing boundaries; distinguish attempt duration from full operation duration, including retries and backoff.
+- Emit structured `http_attempt_completed` and `operation_completed` events with appropriate outcomes and severity; for Gemini, include response parsing and structured assessment validation in the operation boundary.
+- Extract and validate Gemini usage metadata; report observed prompt, output, and total token counts separately from estimated cost, including when a response has billable usage but fails assessment validation.
+- Implement strict token-pricing and billable-token models, model-specific exact-match pricing lookup, and `Decimal` cost calculation for uncached input, cached input, and billable output (including thinking tokens where reported).
+- Emit `gemini_cost_estimated` only when complete, consistent usage and configured pricing support the estimate. Leave the production pricing table empty until verified rates are configured; unknown cost is never presented as a free request.
+- Aggregate validated structured events into operation counts, success/failure counts, total/average latency, Gemini usage totals, estimate counts, and known estimated USD subtotals. Avoid double-counting HTTP attempts and preserve zero estimates as observations.
+- Add deterministic JSON operational reports, validated JSONL log parsing with line-numbered failures, and offline end-to-end reporting and reliability tests.
+- Extend structured log schema with an optional backward-compatible `operation_id`; propagation and per-operation correlation are deferred.
 
-**Task 6.6 — CI checks (planned)**
-- Run the offline test suite automatically without live provider calls or secrets.
-- Add repeatable checks for code quality and test regressions.
+**Task 6.6 — CI checks (existing workflow verified)**
+- Use the existing GitHub Actions test workflow, with successful checks shown on both `push` and `pull_request` in a merged PR.
+- Verify the full local test suite passes with `GEMINI_API_KEY` removed from the environment (`env -u GEMINI_API_KEY pytest -q`).
+- Keep stronger guarantees about complete network isolation, current workflow configuration, and failure-path enforcement as follow-up verification rather than claiming these were independently audited.
 
 **Remaining limitations and follow-up**
 - Gemini retries do not guarantee exactly-once generation or billing; failures can occur after server-side processing.
 - Numeric `Retry-After` values are capped by the current delay policy, which may retry earlier than a provider requests; improve wait-budget handling before claiming full rate-limit compliance.
 - HTTP retry/failure events do not cover every parsing, schema-validation, or unexpected application error.
-- Latency, token usage, monetary cost reporting, and CI automation have not yet been completed.
+- The currently conservative Gemini billing mapper requires explicit thinking and cached-token counts and consistent total-token accounting; legitimate provider responses with omitted or additional categories may have no cost estimate.
+- Pricing rates are not configured for production; monetary output is a subtotal of observed estimates, **not** a complete provider invoice. Cached-input, thinking-token, and tier-specific provider billing rules must be verified before relying on live estimates.
+- `operation_id` is optional but is not yet propagated through ATS and Gemini events. Precise per-operation attribution, duplicate detection, and missing-cost coverage are deferred.
+- The JSONL reporting pipeline exists as tested functions; a public metrics CLI and log-file ingestion command are deferred.
+- Full network isolation, a review of the current CI workflow configuration, and failure-detection verification remain potential CI hardening work.
 - The legacy `job-hunter --ai` route remains separate from the focused Gemini requirements assessor and still needs verification.
 
-**Completion criteria:** Expected provider failures should not silently corrupt eligibility decisions, expose sensitive diagnostics, or block useful partial results. Milestone 6 is complete only after cost/latency visibility and CI checks are implemented and verified.
+**Completion criteria met for the implemented scope:** Expected provider failures preserve useful partial results and safe diagnostics; deterministic offline tests cover retries, timing, usage, cost estimation, aggregation, and JSONL reporting; existing CI checks run on pushes and pull requests. Deferred attribution and production pricing verification do not block the next portfolio-readiness phase.
 
 ### Milestone 7 — Portfolio Readiness
 
@@ -321,11 +331,11 @@ The project will be considered successful when:
 
 ## 7. Current Priorities
 
-1. Complete Milestone 6.5 with testable request-latency measurement, Gemini usage metadata, and clearly labeled cost estimates.
-2. Complete Milestone 6.6 with automated offline CI checks that do not require API credentials or paid model calls.
+1. Begin Milestone 7 portfolio readiness: architecture documentation, clear setup instructions, and a reproducible end-to-end demonstration.
+2. Explain and verify the separation between the legacy `job-hunter --ai` CLI path and the focused Gemini requirements assessor.
 3. Resolve verified candidate-profile inconsistencies (including Docker production experience).
-4. Keep curated regression fixtures and evaluation methodology current as new failure cases appear; avoid interpreting tiny in-sample pass rates as general accuracy.
-5. Prepare Milestone 7 architecture documentation, a reproducible end-to-end demonstration, and a clear explanation of the legacy CLI AI path versus the separate technical assessor.
+4. Maintain evaluation fixtures and baseline methodology; treat small curated pass rates as regression checks rather than estimates of general accuracy.
+5. Defer operation-level event correlation, a metrics CLI, live Gemini pricing configuration, and additional CI/network-isolation hardening until those capabilities are needed.
 
 ## 8. Guiding Principle
 
