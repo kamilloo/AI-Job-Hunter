@@ -14,6 +14,8 @@ The primary use case is finding backend, platform, and AI-transition roles that 
 - Keep eligibility (`eligible`, `review`, `rejected`) separate from relevance and AI-transition scores.
 - Use an LLM to assess natural-language technical requirements while explicitly preserving uncertainty and evidence.
 - Measure classification behavior using labeled fixtures, offline tests, optional live Gemini experiments, and JSON reports.
+- Handle provider failures with bounded retries, partial-discovery recovery, and structured diagnostics.
+- Track request and operation latency, Gemini token usage, and conservatively estimated cost; aggregate validated events into JSON operational reports.
 
 **Design principle:** An appealing job or high similarity score must not override a confirmed hard restriction. Missing evidence calls for review, not an unsupported positive recommendation.
 
@@ -59,6 +61,56 @@ python -c "import sqlite3; c=sqlite3.connect('jobs.sqlite3'); c.execute('update 
 ```
 
 These examples manipulate the local database directly; a dedicated job-status CLI is not yet provided.
+
+## Operational reliability and metrics
+
+**Milestone 6 is implemented for its documented scope.** ATS and Gemini HTTP operations classify failures and use bounded retry policies. ATS GET requests allow up to three total attempts; Gemini generation allows up to two for eligible failures, while ambiguous timeout failures are not retried automatically. Discovery isolates failing boards, preserves successful sources, and reports `complete`, `partial`, `failed`, or `no_sources` rather than silently dropping failures.
+
+### Structured logging and latency
+
+Validated JSON log events record scheduled retries, terminal HTTP failures, individual HTTP attempt durations (`http_attempt_completed`), and end-to-end operation durations (`operation_completed`). Operation timing includes retries and backoff; Gemini operation timing also includes assessment response parsing and validation. The metrics aggregator counts operation durations **without adding HTTP attempt durations again**. Diagnostics avoid logging raw job descriptions, candidate details, API keys, URLs, and raw provider exceptions.
+
+### Gemini usage and estimated costs
+
+When Gemini provides valid usage metadata, the assessor emits `gemini_usage_reported` with observed token counts. Cost estimates use strict token accounting, model-specific pricing lookup, and `Decimal` arithmetic for uncached input, cached input, and billable output (including thinking tokens where reported). A `gemini_cost_estimated` event is emitted **only** if usage is complete and consistent and a pricing configuration exists for the exact model.
+
+**Production pricing is intentionally not configured.** Without verified model rates, usage can be observed but no monetary estimate is emitted. Missing thinking or cached-token categories can also prevent an estimate. Known estimated USD is therefore a **subtotal of available estimates, not an invoice**; missing cost data does not imply a free request. Failed technical assessment validation can still produce billable usage and an estimate.
+
+### Operational JSON reports
+
+The tested reporting pipeline accepts validated structured events, aggregates operation outcomes, latency, Gemini usage, and known estimated USD, then serializes the result as JSON:
+
+```text
+JSONL log lines → parse_log_lines() → build_operational_report() → JSON report
+```
+
+For example, to report on an existing file containing **only structured JSONL log events**:
+
+```python
+from pathlib import Path
+
+from job_hunter.metrics.build_operational_report import build_operational_report
+from job_hunter.metrics.parse_log_lines import parse_log_lines
+
+with Path("logs.jsonl").open(encoding="utf-8") as lines:
+    report_json = build_operational_report(parse_log_lines(lines))
+
+print(report_json)
+```
+
+This is a Python API example, **not** a `job-hunter metrics` CLI command. The parser rejects malformed nonblank records with line-numbered errors. Monetary amounts are represented as decimal strings in JSON to preserve precision. The report distinguishes the number of observed cost estimates from their subtotal.
+
+An optional `operation_id` exists in the log schema, but IDs are not yet propagated through requests. Per-operation cost attribution and exact missing-estimate coverage remain deferred, as does a public metrics-reporting CLI.
+
+### CI and offline verification
+
+The existing GitHub Actions workflow has run checks on both pushes and pull requests. The full local test suite has also passed with the Gemini key absent:
+
+```bash
+env -u GEMINI_API_KEY pytest -q
+```
+
+Explicit live Gemini evaluation commands remain separate from the default test suite. Full network-isolation auditing and additional CI failure-path verification remain potential hardening tasks.
 
 ## Evaluation framework
 
@@ -139,7 +191,7 @@ pytest -q
 pytest -q tests/test_evaluation_metrics.py tests/test_evaluation_reports.py tests/test_evaluation_scripts.py
 ```
 
-The test suite includes classification metrics, malformed labels, empty inputs, offline runner artifacts, overwrite protection, mocked Gemini calls, reference-label isolation, error continuation, and key-redaction checks. The normal test suite does not require paid Gemini calls.
+The test suite includes classification metrics, malformed labels, empty inputs, offline runner artifacts, overwrite protection, mocked Gemini calls, reference-label isolation, error continuation, and key-redaction checks. It also covers retry behavior, latency boundaries, usage and cost estimates, structured event aggregation, JSONL parsing, and reporting. The normal test suite does not require paid Gemini calls.
 
 ## Roadmap
 
@@ -150,7 +202,7 @@ The test suite includes classification metrics, malformed labels, empty inputs, 
 | 3. Eligibility vs. scoring | Explicit hard constraints, uncertainty, separate ranking | Completed |
 | 4. Evaluation framework | Golden fixtures, offline and live runners, metrics, tests | Functionally complete; minor validation/documentation refinements |
 | 5. AI quality | Structured candidate evidence, deterministic grounding, focused Gemini regressions, metrics and saved-report comparison | Completed |
-| 6. Operational reliability | Rate limits, retries, diagnostics, cost/latency tracking, CI | Planned |
+| 6. Operational reliability | Rate limits, retries, partial recovery, structured diagnostics, latency, usage/cost estimation, JSONL reporting, CI | Completed for implemented scope; correlation and live pricing deferred |
 | 7. Portfolio readiness | Architecture and trade-offs, reproducible demo, documentation | Planned |
 
 See [Project Roadmap](docs/PROJECT_ROADMAP.md) for completed milestones, engineering decisions, known limitations and upcoming priorities.
@@ -162,6 +214,8 @@ See [Project Roadmap](docs/PROJECT_ROADMAP.md) for completed milestones, enginee
 - **LLM outputs are untrusted until checked:** Requirements cite employer text; deterministic validators check job quotations and candidate quotations against documented experience contexts. Unsupported or missing direct experience remains visible as uncertainty.
 - **Quality measures stay separate:** Deterministic eligibility accuracy, focused requirement-classification pass rates, evidence-grounding rates and technical-fit agreement answer different questions. Small curated datasets are regression tools, not calibrated real-world performance.
 - **Evaluation is reproducible and deliberately opt-in:** Offline tests and report comparisons need no API key. Live Gemini runs are explicit and may incur provider charges; reports preserve useful experiment metadata and remain local.
+- **Operational costs are conservative estimates:** Report only supported token accounting and configured model prices. Missing costs remain unknown, and aggregated known estimates are not treated as a complete bill.
+- **Retry and latency semantics are explicit:** Retry budgets are bounded, ambiguous Gemini transport failures are handled conservatively, and operation latency is not double-counted with individual HTTP attempts.
 
 ## Limitations and safety boundaries
 
@@ -172,7 +226,8 @@ See [Project Roadmap](docs/PROJECT_ROADMAP.md) for completed milestones, enginee
 - **Technical uncertainty:** An LLM's assessment is not proof of candidate experience; unverified mandatory skills should remain visible. Exact-quotation grounding does not establish semantic correctness, and technical-fit labels can involve judgment.
 - **Scoring:** Relevance and AI-transition scores are baseline heuristics, not calibrated hiring probabilities.
 - **Privacy and artifacts:** Evaluation reports can include candidate-profile content, job descriptions, prompts, and model outputs. Files in `evaluations/results/` are intentionally Git-ignored. Review any artifact before sharing it.
-- **API use:** Live AI runs incur provider costs and may encounter model variability, API errors, and rate limits. Use a supported model and keep API keys out of source control.
+- **API use:** Live AI runs incur provider costs and may encounter model variability, API errors, and rate limits. Use a supported model and keep API keys out of source control. Retries cannot guarantee exactly-once Gemini execution or billing; capped `Retry-After` delays may be shorter than provider guidance.
+- **Operational cost coverage:** No verified production Gemini pricing is configured; strict usage accounting may omit valid provider responses. Structured reports contain known estimated subtotals, not actual bills or per-operation attribution. Operation correlation and a public metrics CLI are deferred.
 - **Scheduling:** Despite the project name, unattended production scheduling has not been established as a completed feature.
 
 ## References
