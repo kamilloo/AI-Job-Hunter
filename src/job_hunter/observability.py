@@ -1,5 +1,6 @@
 import logging
 from decimal import Decimal
+from uuid import UUID
 
 from job_hunter.model.Log import Log
 
@@ -17,6 +18,7 @@ def make_log_event(
     total_tokens: int | None = None,
     model: str | None = None,
     estimated_cost_usd: Decimal | None = None,
+    operation_id: UUID | None = None,
 ) -> Log:
     return Log(
         event=event,
@@ -31,6 +33,7 @@ def make_log_event(
         total_tokens=total_tokens,
         model=model,
         estimated_cost_usd=estimated_cost_usd,
+        operation_id=operation_id,
     )
 
 def emit_log(logger: logging.Logger, event: Log) -> None:

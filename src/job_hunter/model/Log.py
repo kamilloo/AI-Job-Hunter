@@ -1,6 +1,7 @@
 import logging
 from decimal import Decimal
 from typing import Literal
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -35,3 +36,8 @@ class Log(BaseModel):
     # LLM Cost Logging
     model: str | None = None
     estimated_cost_usd: Decimal | None = Field(default=None,ge=0,allow_inf_nan=False)
+
+    operation_id: str | None = Field(
+        default=None,
+        min_length=1,
+    )

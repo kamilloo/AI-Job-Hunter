@@ -1,4 +1,5 @@
 from decimal import Decimal
+from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
@@ -190,3 +191,44 @@ def test_existing_events_omit_cost_fields():
 
     assert "model" not in data
     assert "estimated_cost_usd" not in data
+
+def test_log_accepts_operation_id():
+    operation_id = str(uuid4())
+
+    event = make_log_event(
+        event="operation_completed",
+        component="gemini",
+        outcome="success",
+        duration_ms=100.0,
+        operation_id=operation_id,
+    )
+
+    assert event.operation_id == operation_id
+    assert (
+        event.model_dump(mode="json")["operation_id"]
+        == operation_id
+    )
+
+
+def test_existing_logs_omit_operation_id():
+    event = make_log_event(
+        event="operation_completed",
+        component="ats",
+        outcome="success",
+        duration_ms=100.0,
+    )
+
+    assert "operation_id" not in event.model_dump(
+        exclude_none=True
+    )
+
+
+def test_empty_operation_id_is_rejected():
+    with pytest.raises(ValidationError):
+        make_log_event(
+            event="operation_completed",
+            component="gemini",
+            outcome="success",
+            duration_ms=100.0,
+            operation_id="",
+        )
