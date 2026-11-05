@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 from pydantic import ValidationError
 import json
@@ -113,3 +115,78 @@ def test_emit_log_uses_warning_level():
     assert level == logging.WARNING
     assert json.loads(message)["attempt"] == 1
     assert json.loads(message)["status_code"] == 503
+
+
+
+def test_cost_event_preserves_decimal_precision():
+    event = make_log_event(
+        event="gemini_cost_estimated",
+        component="gemini",
+        outcome="success",
+        model="model-a",
+        estimated_cost_usd=Decimal("0.00166"),
+        level=logging.INFO,
+    )
+
+    data = json.loads(
+        event.model_dump_json(exclude_none=True)
+    )
+
+    assert data == {
+        "event": "gemini_cost_estimated",
+        "component": "gemini",
+        "outcome": "success",
+        "model": "model-a",
+        "estimated_cost_usd": "0.00166",
+        "level": logging.INFO,
+    }
+
+
+def test_cost_event_accepts_zero():
+    event = make_log_event(
+        event="gemini_cost_estimated",
+        component="gemini",
+        outcome="success",
+        model="model-a",
+        estimated_cost_usd=Decimal("0"),
+    )
+
+    data = json.loads(event.model_dump_json(exclude_none=True))
+
+    assert data["estimated_cost_usd"] == "0"
+
+
+@pytest.mark.parametrize(
+    "invalid_cost",
+    [
+        Decimal("-0.01"),
+        Decimal("NaN"),
+        Decimal("Infinity"),
+        Decimal("-Infinity"),
+    ],
+)
+def test_cost_event_rejects_invalid_estimates(invalid_cost):
+    with pytest.raises(ValidationError):
+        make_log_event(
+            event="gemini_cost_estimated",
+            component="gemini",
+            outcome="success",
+            model="model-a",
+            estimated_cost_usd=invalid_cost,
+        )
+
+
+def test_existing_events_omit_cost_fields():
+    event = make_log_event(
+        event="http_retry_scheduled",
+        component="gemini",
+        outcome="retry",
+        attempt=1,
+        status_code=503,
+        level=logging.WARNING,
+    )
+
+    data = json.loads(event.model_dump_json(exclude_none=True))
+
+    assert "model" not in data
+    assert "estimated_cost_usd" not in data

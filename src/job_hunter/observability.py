@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from job_hunter.model.Log import Log
 
@@ -14,6 +15,8 @@ def make_log_event(
     prompt_tokens: int | None = None,
     output_tokens: int | None = None,
     total_tokens: int | None = None,
+    model: str | None = None,
+    estimated_cost_usd: Decimal | None = None,
 ) -> Log:
     return Log(
         event=event,
@@ -26,6 +29,8 @@ def make_log_event(
         prompt_tokens=prompt_tokens,
         output_tokens=output_tokens,
         total_tokens=total_tokens,
+        model=model,
+        estimated_cost_usd=estimated_cost_usd,
     )
 
 def emit_log(logger: logging.Logger, event: Log) -> None:

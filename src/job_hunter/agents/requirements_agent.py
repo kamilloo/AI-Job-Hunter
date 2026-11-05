@@ -17,6 +17,8 @@ from job_hunter.calculate_backoff import calculate_backoff
 from job_hunter.calculate_retry_delay import calculate_retry_delay
 from job_hunter.classify_http_error import classify_http_error, FailureCategory
 from job_hunter.classify_transport_error import classify_transport_error
+from job_hunter.cost import pricing_config
+from job_hunter.cost.make_gemini_cost_event import make_gemini_cost_event
 from job_hunter.gemini_retry import gemini_retry_safe
 from job_hunter.latency.elapsed_ms import elapsed_ms
 from job_hunter.model.RequirementAssessment import TechnicalAssessment
@@ -246,6 +248,15 @@ async def assess_requirements(
                         level=logging.INFO,
                     ),
                 )
+
+                cost_event = make_gemini_cost_event(
+                    usage=usage,
+                    model=selected_model,
+                    pricing_table=pricing_config.GEMINI_PRICING_TABLE,
+                )
+
+                if cost_event is not None:
+                    emit_log(logger, cost_event)
 
             # Preserve the existing response validation.
             candidates = response_data.get("candidates", [])
