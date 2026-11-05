@@ -381,7 +381,7 @@ def complete_usage_metadata():
     }
 
 
-def test_pricing_table():
+def hardcoded_pricing_table():
     return {
         "model-a": TokenPricing(
             input_per_million=Decimal("0.50"),
@@ -417,7 +417,7 @@ def test_gemini_unknown_pricing_omits_cost_event(caplog):
     with (
         patch.dict(
             "job_hunter.cost.pricing_config.GEMINI_PRICING_TABLE",
-            test_pricing_table(),
+            hardcoded_pricing_table(),
             clear=True,
         ),
         caplog.at_level(logging.INFO, logger=LOGGER_NAME),
@@ -473,7 +473,7 @@ def test_gemini_incomplete_usage_omits_cost_event(caplog):
     with (
         patch.dict(
             "job_hunter.cost.pricing_config.GEMINI_PRICING_TABLE",
-            test_pricing_table(),
+            hardcoded_pricing_table(),
             clear=True,
         ),
         caplog.at_level(logging.INFO, logger=LOGGER_NAME),
@@ -541,7 +541,7 @@ def test_gemini_invalid_assessment_still_emits_cost(caplog):
     with (
         patch.dict(
             "job_hunter.cost.pricing_config.GEMINI_PRICING_TABLE",
-            test_pricing_table(),
+            hardcoded_pricing_table(),
             clear=True,
         ),
         caplog.at_level(logging.INFO, logger=LOGGER_NAME),
@@ -663,7 +663,7 @@ def test_gemini_malformed_usage_omits_cost_event(
     with (
         patch.dict(
             "job_hunter.cost.pricing_config.GEMINI_PRICING_TABLE",
-            test_pricing_table(),
+            hardcoded_pricing_table(),
             clear=True,
         ),
         caplog.at_level(logging.INFO, logger=LOGGER_NAME),
