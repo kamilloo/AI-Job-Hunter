@@ -216,15 +216,17 @@ def test_discovery_preserves_jobs_when_one_source_fails(tmp_path):
             side_effect=fake_collect,
         ) as mock_collect,
         patch(
-            "job_hunter.collectors.verify_detail",
+            "job_hunter.cli.verify_detail",
             new_callable=AsyncMock,
-        ),
+            return_value=VerificationResult(verified=True),
+        ) as mock_verify,
     ):
         asyncio.run(run(args))
 
     report = output.read_text(encoding="utf-8")
 
     assert mock_collect.await_count == 2
+    mock_verify.assert_awaited_once()
     assert "Backend Engineer" in report
     assert "Collection / verification errors" in report
     assert "Collection failure: greenhouse/broken" in report
@@ -341,9 +343,10 @@ def test_discovery_preserves_jobs_when_two_invalid_jobs(tmp_path):
             side_effect=fake_collect,
         ) as mock_collect,
         patch(
-            "job_hunter.collectors.verify_detail",
+            "job_hunter.cli.verify_detail",
             new_callable=AsyncMock,
-        ),
+            return_value=VerificationResult(verified=True),
+        ) as mock_verify,
     ):
         asyncio.run(run(args))
 
@@ -355,6 +358,7 @@ def test_discovery_preserves_jobs_when_two_invalid_jobs(tmp_path):
     assert "Collection failure:" not in report_text
     assert "greenhouse/working: 2 invalid records skipped" in report_text
     assert mock_collect.await_count == 1
+    mock_verify.assert_awaited_once()
 
 def test_partial_verification_failure_preserves_jobs(tmp_path):
     args = make_args(tmp_path)
