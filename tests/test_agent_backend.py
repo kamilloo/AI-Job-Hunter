@@ -50,8 +50,8 @@ def test_sdk_configuration_and_output_validation(monkeypatch, output):
 
 def test_installed_sdk_schema_compatibility():
     # Optional extra is not required for the default test suite.
-    agents = pytest.importorskip('agents')
-    schema = agents.AgentOutputSchema(TechnicalAssessment)
+    agent_output = pytest.importorskip('agents.agent_output')
+    schema = agent_output.AgentOutputSchema(TechnicalAssessment)
     assert schema.is_strict_json_schema()
     assert 'requirements' in schema.json_schema()['properties']
 
@@ -65,7 +65,7 @@ def test_missing_sdk_does_not_fall_back(monkeypatch):
 
 def test_actual_sdk_with_in_memory_http(monkeypatch):
     """Exercise SDK serialization and parsing without a network request."""
-    pytest.importorskip('agents')
+    pytest.importorskip('agents.agent_output')
     openai = pytest.importorskip('openai')
     import httpx
 
