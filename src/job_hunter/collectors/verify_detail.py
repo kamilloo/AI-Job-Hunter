@@ -37,9 +37,13 @@ async def verify_detail(client, job:Job) -> VerificationResult:
         return VerificationResult(verified=True)
     if endpoint:
         start = time.perf_counter()
+        outcome = "failure"
+        status_code = None
         try:
             r = await client.get(endpoint)
+            status_code = r.status_code
             r.raise_for_status()
+            outcome = "success"
             job.verified_live = True
             job.verified_at = datetime.now(timezone.utc).isoformat()
 
@@ -63,11 +67,12 @@ async def verify_detail(client, job:Job) -> VerificationResult:
                      make_log_event(
                          event="http_attempt_completed",
                          component='ats',
-                         outcome="success",
+                         outcome=outcome,
                          attempt=1,
-                         status_code=200,
+                         status_code=status_code,
                          duration_ms=duration_ms,
-                         level=logging.INFO,
+                         level=(logging.INFO if outcome == "success"
+                                else logging.WARNING),
                      ),
                  )
 
