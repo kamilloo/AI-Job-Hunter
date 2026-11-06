@@ -81,6 +81,17 @@ def build_prompt(candidate_profile: Mapping[str, Any], job_description: str) -> 
     )
 
 
+def gemini_config(model: str | None = None, *, api_key: str | None = None) -> tuple[str, str]:
+    """Resolve and validate Gemini configuration for callers and CLI preflight."""
+    key = (api_key if api_key is not None else os.getenv("GEMINI_API_KEY", "")).strip()
+    if not key:
+        raise ValueError("--ai requires GEMINI_API_KEY")
+    selected = model if model is not None else os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+    if not selected or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._" for c in selected):
+        raise ValueError("Expected a Gemini model ID without a URL or path")
+    return key, selected
+
+
 async def assess_requirements(
     candidate_profile: Mapping[str, Any],
     job_description: str,
@@ -94,12 +105,7 @@ async def assess_requirements(
     Reads GEMINI_API_KEY and GEMINI_MODEL when explicit values are omitted.
     An injected HTTP client remains owned by the caller.
     """
-    key = api_key or os.getenv("GEMINI_API_KEY")
-    if not key:
-        raise ValueError("GEMINI_API_KEY is required for requirements assessment")
-    selected_model = model or os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
-    if not selected_model or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._" for c in selected_model):
-        raise ValueError("Expected a Gemini model ID without a URL or path")
+    key, selected_model = gemini_config(model, api_key=api_key)
     if not job_description.strip():
         raise ValueError("An employer job description is required")
 

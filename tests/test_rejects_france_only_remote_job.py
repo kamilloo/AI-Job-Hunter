@@ -1,4 +1,3 @@
-from job_hunter.agent import analyze
 from job_hunter.models import JobAnalysis, Eligibility
 from job_hunter.recommend import recommend
 

@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from job_hunter.combine_eligibility import combine_eligibility
-from job_hunter.validation.evidence import validate_job_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -19,16 +18,8 @@ from evaluations.common import digest, finish, load_inputs, parser, save
 from job_hunter.agents.requirements_agent import ASSESSMENT_INSTRUCTIONS, assess_requirements, build_prompt
 from job_hunter.evaluate import evaluate
 from job_hunter.model.RequirementAssessment import TechnicalAssessment, MatchingAssessment
-from job_hunter.models import Eligibility, Job
-from job_hunter.technical_eligibility import technical_eligibility
-
-
-def final_prediction(deterministic, technical):
-    if deterministic == Eligibility.rejected:
-        return Eligibility.rejected
-    if deterministic == Eligibility.review or technical == Eligibility.review:
-        return Eligibility.review
-    return Eligibility.eligible
+from job_hunter.models import Job
+from job_hunter.technical_eligibility import grounded_technical_eligibility
 
 
 async def run(args):
@@ -62,26 +53,7 @@ async def run(args):
             try:
                 # Deliberately do not send labels, rubrics or reference explanations.
                 assessment = await assess_requirements(profile, job.description, model, client=client)
-                for requirement in assessment.requirements:
-                    requirement.evidence_validation = validate_job_evidence(
-                        job.description,
-                        requirement.job_evidence,
-                    )
-
-                invalid_evidence = any(
-                    requirement.evidence_validation is None
-                    or not requirement.evidence_validation.valid
-                    for requirement in assessment.requirements
-                )
-
-                technical = technical_eligibility(assessment)
-
-                if invalid_evidence:
-                    technical = Eligibility.review
-
-                # No extracted requirements is insufficient evidence, not a pass.
-                if not assessment.requirements:
-                    technical = Eligibility.review
+                technical = grounded_technical_eligibility(assessment, profile, job.description)
                 row['assessment'] = assessment.model_dump(mode='json')
                 row['technical_prediction'] = technical.value
                 matching = MatchingAssessment(

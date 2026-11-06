@@ -1,7 +1,6 @@
 import argparse
 import asyncio
 import json
-import os
 import sqlite3
 import logging
 from datetime import datetime, timezone
@@ -14,7 +13,10 @@ from job_hunter.collectors.verify_detail import verify_detail
 from job_hunter.observability import emit_log, make_log_event
 from job_hunter.discovery_log_level import discovery_log_level
 from job_hunter.evaluate import evaluate
-from job_hunter.agent import analyze
+from job_hunter.agents.requirements_agent import assess_requirements, gemini_config
+from job_hunter.agent import assess_requirements_agent
+from job_hunter.technical_eligibility import grounded_technical_eligibility
+from job_hunter.combine_eligibility import combine_eligibility
 from job_hunter.models import Job, Eligibility
 from job_hunter.describe_source_error import describe_source_error
 from job_hunter.safe_identifier import safe_identifier
@@ -72,6 +74,8 @@ def report(
                       f"- **Job:** {job.url} | **Apply:** {job.apply_url or 'unknown'}",
                       f"- **Reasons:** {'; '.join(match.reasons) or 'None established'}",
                       f"- **Concerns:** {'; '.join(match.concerns) or 'None established'}", ""]
+            if getattr(match, 'ai_backend', None):
+                lines.insert(len(lines) - 1, f"- **AI backend:** {match.ai_backend}")
     if errors:
         lines += ["## Collection / verification errors", ""]
 
@@ -187,9 +191,21 @@ async def run(args):
             continue
         match = evaluate(job, profile)
         if args.ai and match.eligibility != Eligibility.rejected:
+            match.ai_backend = getattr(args, 'ai_backend', 'gemini')
             try:
-                match = await analyze(job, match, profile, args.model)
+                assessor = assess_requirements_agent if match.ai_backend == 'agent' else assess_requirements
+                assessment = await assessor(profile, job.description, args.model)
+                technical = grounded_technical_eligibility(assessment, profile, job.description)
+                match.eligibility = combine_eligibility(match.eligibility, technical)
+                match.ai_analyzed = True
+                if technical == Eligibility.review:
+                    match.concerns.append("AI technical requirements need review: missing, uncertain, or ungrounded evidence")
+                else:
+                    match.reasons.append("AI technical assessment passed quotation checks; manual semantic verification remains necessary")
             except Exception as exc:
+                match.ai_analyzed = False
+                match.eligibility = Eligibility.review
+                match.concerns.append("AI analysis failed; technical eligibility requires review")
                 ai_errors.append({
                     "job_key": job.key,
                     "error_type": type(exc).__name__,
@@ -253,11 +269,18 @@ def main():
     parser.add_argument('--sources', default=str(ROOT/'config/sources.yaml'))
     parser.add_argument('--database', default='jobs.sqlite3')
     parser.add_argument('--output', default='reports/daily.md')
-    parser.add_argument('--ai', action='store_true', help='Enable OpenAI Agents SDK analysis')
-    parser.add_argument('--model', default=os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite') if os.getenv('GEMINI_API_KEY') else os.getenv('OPENAI_MODEL', 'gpt-4.1-mini'))
+    parser.add_argument('--ai', action='store_true', help='Enable evidence-checked Gemini technical analysis')
+    parser.add_argument('--ai-backend', choices=('gemini', 'agent'), default='gemini',
+                        help='AI execution backend (default: gemini HTTP; agent requires the [ai] extra)')
+    parser.add_argument('--model', help='Gemini model ID; defaults to GEMINI_MODEL')
     args = parser.parse_args()
-    if args.ai and not (os.getenv('GEMINI_API_KEY') or os.getenv('OPENAI_API_KEY')):
-        parser.error('--ai requires GEMINI_API_KEY or OPENAI_API_KEY and pip install -e ".[ai]"')
+    if args.ai_backend != 'gemini' and not args.ai:
+        parser.error('--ai-backend agent requires --ai')
+    if args.ai:
+        try:
+            gemini_config(args.model)
+        except ValueError as exc:
+            parser.error(str(exc))
     asyncio.run(run(args))
 
 if __name__ == '__main__': main()

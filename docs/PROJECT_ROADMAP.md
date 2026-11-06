@@ -101,7 +101,7 @@ Track source code, fixtures, configuration and tests in Git. Generate timestampe
 - Integration with ATS job sources.
 - Retrieval of job descriptions and application URLs.
 - Structured job normalization.
-- Integration with Gemini and the OpenAI Agents SDK.
+- Integration with Gemini through the shared technical-requirements assessor.
 - Evidence-based matching against the candidate profile.
 - Handling of incomplete job information.
 
