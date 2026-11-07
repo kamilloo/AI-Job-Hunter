@@ -17,6 +17,7 @@ from job_hunter.agents.requirements_agent import assess_requirements, gemini_con
 from job_hunter.agent import assess_requirements_agent
 from job_hunter.technical_eligibility import grounded_technical_eligibility
 from job_hunter.combine_eligibility import combine_eligibility
+from job_hunter.select_ai_candidates import select_ai_candidates
 from job_hunter.models import Job, Eligibility
 from job_hunter.describe_source_error import describe_source_error
 from job_hunter.safe_identifier import safe_identifier
@@ -195,20 +196,25 @@ async def run(args):
     db_init(conn)
     known = {row[0]:row[1] for row in conn.execute('SELECT key,status FROM jobs')}
     items = []
-    ai_attempts = 0
     max_ai_jobs = getattr(args, 'max_ai_jobs', None)
     for job in jobs:
         if known.get(job.key) in ('applied','skipped','dismissed'):
             save_job(conn, job)
             continue
-        match = evaluate(job, profile)
-        if (args.ai and match.eligibility != Eligibility.rejected
-                and max_ai_jobs is not None and ai_attempts >= max_ai_jobs):
-            match.eligibility = Eligibility.review
-            match.concerns.append("AI assessment skipped: --max-ai-jobs limit reached; technical eligibility requires review")
-        elif args.ai and match.eligibility != Eligibility.rejected:
+        items.append((job, evaluate(job, profile)))
+    if args.ai:
+        selected = select_ai_candidates(items, max_ai_jobs)
+        selected_keys = {job.key for job, _ in selected}
+        for job, match in items:
+            if match.eligibility != Eligibility.rejected and job.key not in selected_keys:
+                match.eligibility = Eligibility.review
+                match.concerns.append("AI assessment skipped: --max-ai-jobs limit reached; technical eligibility requires review")
+        # Unlimited runs retain their existing assessment execution order.
+        execution_order = selected if max_ai_jobs is not None else items
+        for job, match in execution_order:
+            if job.key not in selected_keys:
+                continue
             match.ai_backend = getattr(args, 'ai_backend', 'gemini')
-            ai_attempts += 1
             try:
                 assessor = assess_requirements_agent if match.ai_backend == 'agent' else assess_requirements
                 assessment = await assessor(profile, job.description, args.model)
@@ -231,8 +237,8 @@ async def run(args):
                     "job_key": job.key,
                     "error_type": type(exc).__name__,
                 })
+    for job, _ in items:
         save_job(conn, job)
-        items.append((job, match))
     conn.commit(); conn.close()
     total_sources = len(boards)
     failed_sources = len(collection_errors)
@@ -297,7 +303,7 @@ def main():
                         help='AI execution backend (default: gemini HTTP; agent requires the [ai] extra)')
     parser.add_argument('--model', help='Gemini model ID; defaults to GEMINI_MODEL')
     parser.add_argument('--max-ai-jobs', type=int, default=None,
-                        help='Positive maximum AI assessment attempts in collection order (default: unlimited)')
+                        help='Positive maximum AI assessment attempts, ranked by deterministic fit (default: unlimited)')
     args = parser.parse_args()
     if args.max_ai_jobs is not None:
         if args.max_ai_jobs <= 0:
