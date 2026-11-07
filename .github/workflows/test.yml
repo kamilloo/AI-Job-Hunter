@@ -3,10 +3,13 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        extras: [dev, 'dev,ai']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install -e '.[dev]'
+      - run: pip install -e '.[${{ matrix.extras }}]'
       - run: pytest -q

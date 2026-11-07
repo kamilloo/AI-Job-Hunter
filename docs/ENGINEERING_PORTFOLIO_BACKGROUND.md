@@ -226,7 +226,7 @@ Use a **two-layer presentation**: (A) stable precomputed outputs suitable for an
 ```bash
 git rev-parse HEAD
 python --version
-python -m pip install -e '.[dev,ai]'
+python -m pip install -e '.[dev]'
 env -u GEMINI_API_KEY pytest -q
 ```
 

@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Literal
 from pydantic import BaseModel, Field, HttpUrl
 
 class Eligibility(str, Enum):
@@ -46,6 +47,7 @@ class Match(BaseModel):
     concerns: list[str] = Field(default_factory=list)
     evidence: list[str] = Field(default_factory=list)
     ai_analyzed: bool = False
+    ai_backend: Literal['gemini', 'agent'] | None = None
 
 class JobHunter(BaseModel):
     job: Job

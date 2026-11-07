@@ -24,7 +24,7 @@ The primary use case is finding backend, platform, and AI-transition roles that 
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install -e '.[dev,ai]'
+python -m pip install -e '.[dev]'
 pytest -q
 ```
 
@@ -38,7 +38,39 @@ job-hunter --output reports/daily.md
 
 Open `reports/daily.md` to inspect ranked results and evidence. If no company boards are configured, the command can produce a valid report with zero jobs.
 
-> **CLI AI path:** `job-hunter --ai` uses the older `job_hunter.agent` implementation, **not** the separate Gemini technical-requirements evaluation described below. The current `agent.py` has an unresolved import/client setup issue, so its live OpenAI/Gemini execution should be verified and fixed before relying on the command. The deterministic CLI does not require an LLM key.
+### Optional AI CLI
+
+`job-hunter --ai` adds structured technical-requirements analysis after deterministic screening. Two execution backends are available, both using Gemini as the model provider:
+
+| Backend | CLI | Evaluation runners | Dependencies |
+| --- | --- | --- | --- |
+| Gemini HTTP (default) | `job-hunter --ai --ai-backend gemini` | Always used | Base installation |
+| Agents SDK | `job-hunter --ai --ai-backend agent` | Not used | `pip install -e '.[ai]'` |
+
+The SDK backend uses `Agent` and `Runner` through Gemini's OpenAI-compatible endpoint. Both backends use the same instructions, `TechnicalAssessment` output model, quotation checks, and eligibility combination. The old score-based `JobAnalysis` recommendation is not used by either backend. Reports identify the selected backend for attempted AI analyses. OpenAI API credentials are unnecessary.
+
+The SDK backend disables tracing, uses one agent turn with no tools or handoffs, disables client retries, and applies a 60-second client timeout plus a 75-second runner timeout. It does not provide the native Gemini backend's usage/cost events or HTTP retry instrumentation. SDK/schema compatibility and SDK request/response processing are tested locally against an in-memory transport (with platform discovery isolated); live Gemini compatibility must be checked separately for each backend. Platform discovery through the SDK's worker thread stalled in the restricted test environment and remains a live-environment verification item. Missing SDK dependencies or failed SDK calls produce visible AI errors and review outcomes, with no automatic backend fallback.
+
+Set `GEMINI_API_KEY` in your environment or local `.env`. Set `GEMINI_MODEL` to a model supported by your account; the repository default is `gemini-3.5-flash-lite`. `--model` overrides `GEMINI_MODEL`. Empty keys and malformed model IDs are rejected; account access and model availability require a live call. OpenAI environment variables are ignored.
+
+After explicitly deciding to incur provider costs, an optional manual Gemini smoke test is:
+
+```bash
+source .venv/bin/activate
+# Set GEMINI_API_KEY securely in .env; do not commit it.
+export GEMINI_MODEL='gemini-3.5-flash-lite'  # replace if unsupported by your account
+job-hunter --ai --model "$GEMINI_MODEL" \
+  --profile config/profile.yaml --sources config/sources.yaml \
+  --database /tmp/job-hunter-ai-smoke.sqlite3 --output /tmp/job-hunter-ai-smoke.md
+```
+
+Use a sources file containing one official company board to bound discovery, and a fresh disposable database. This command may analyze **every non-rejected job** on that board; it is not a single-call test. Inspect the report's eligibility counts, `AI analyzed` fields, concerns and AI error section. For a single-case provider test using the separate evaluation runner, use `python -m evaluations.run_ai_evaluation --job-id E05`. No live provider integration or production readiness is claimed from mocked tests.
+
+The CLI checks employer quotations against the job description and candidate quotations against concrete `skill_experiences` contexts. Both CLI and AI evaluation use the supplied profile and the assessor’s instructions distinguishing career interests and bare skill lists from concrete experience. Candidate quotations are checked only against `skill_experiences` contexts. Empty assessments, no mandatory requirements, ungrounded evidence, and unknown or unmet mandatory requirements require `review`. AI never upgrades deterministic `review` or `rejected`; hard rejections skip AI entirely. A failed call or invalid output leaves `AI analyzed: False`, moves a non-rejected job to `review`, and adds a diagnostic exception type without raw provider messages. Warnings appear in the report and console count; partial AI failures do not change the CLI exit code.
+
+AI adds fixed validation-status messages, rather than publishing unverified model prose. Fit and AI-transition scores remain deterministic heuristics. Quotation checks prove provenance, not semantic sufficiency, production experience, or completeness of requirement extraction. Inspect source evidence manually before relying on an eligible result. Gemini retains its bounded retry policy. Candidate experience is sent to Gemini.
+
+The separate evaluation runners assess checked-in snapshots against references and save detailed JSON artifacts. They do not collect daily ATS jobs. The AI evaluation runner and CLI share the same grounded technical-eligibility policy, including candidate quotation checks. The focused requirements runner retains its reference-based regression checks. The deterministic CLI needs no LLM key and is unchanged.
 
 ## How the application works
 
@@ -198,7 +230,7 @@ The test suite includes classification metrics, malformed labels, empty inputs, 
 | Milestone | Focus | Status |
 | --- | --- | --- |
 | 1. MVP | Python CLI, structured models, collection, basic matching | Completed |
-| 2. Real discovery and AI integration | ATS sources and optional LLM analysis | Implemented; legacy CLI AI path needs verification |
+| 2. Real discovery and AI integration | ATS sources and optional LLM analysis | Implemented; CLI AI path verified with mocks; live smoke test remains opt-in |
 | 3. Eligibility vs. scoring | Explicit hard constraints, uncertainty, separate ranking | Completed |
 | 4. Evaluation framework | Golden fixtures, offline and live runners, metrics, tests | Functionally complete; minor validation/documentation refinements |
 | 5. AI quality | Structured candidate evidence, deterministic grounding, focused Gemini regressions, metrics and saved-report comparison | Completed |
@@ -232,7 +264,6 @@ See [Project Roadmap](docs/PROJECT_ROADMAP.md) for completed milestones, enginee
 
 ## References
 
-- [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/quickstart/)
 - [Greenhouse public Job Board API](https://docs.greenhouse.io/job-board)
 - [Ashby public postings API](https://developers.ashbyhq.com/docs/public-job-posting-api)
 - [Lever Postings API](https://github.com/lever/postings-api)

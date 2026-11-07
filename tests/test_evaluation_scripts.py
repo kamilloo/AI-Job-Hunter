@@ -209,3 +209,24 @@ def test_strong_technical_fit_with_unknown_mandatory_requirement(
     assert result["assessment"]["technical_fit"] == "strong"
     assert result["technical_prediction"] == "review"
     assert result["final_prediction"] == "review"
+
+
+def test_ai_runner_reviews_ungrounded_candidate_evidence(tmp_path, monkeypatch):
+    """Evaluation uses the same candidate-grounding policy as the daily CLI."""
+    monkeypatch.setenv('GEMINI_API_KEY', 'test')
+    assessment = TechnicalAssessment(
+        requirements=[TechnicalRequirement(
+            name='PHP', mandatory=True, status='met',
+            job_evidence='Senior backend role using PHP',
+            candidate_evidence='Invented production experience',
+            explanation='Unsupported claim',
+        )],
+        summary='Claimed fit', confidence=0.9,
+    )
+    monkeypatch.setattr('evaluations.run_ai_evaluation.assess_requirements', AsyncMock(return_value=assessment))
+    options = args(tmp_path, 'ai', ['E02'])
+    assert asyncio.run(run_ai(options)) == 0
+    row = json.loads(options.output.read_text())['results'][0]
+    assert row['assessment']['requirements'][0]['evidence_validation']['valid'] is True
+    assert row['technical_prediction'] == 'review'
+    assert row['final_prediction'] == 'review'
