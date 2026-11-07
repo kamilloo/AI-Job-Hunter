@@ -20,6 +20,7 @@ from job_hunter.combine_eligibility import combine_eligibility
 from job_hunter.models import Job, Eligibility
 from job_hunter.describe_source_error import describe_source_error
 from job_hunter.safe_identifier import safe_identifier
+from job_hunter.assessment_report import assessment_lines, markdown_text
 
 logger = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,6 +42,8 @@ def report(
     normalization_warnings=None,
     verification_errors=None,
     discovery_summary=None,
+    ai_assessments=None,
+    candidate_contexts=None,
 ):
     ai_errors = ai_errors or []
     normalization_warnings = normalization_warnings or []
@@ -50,6 +53,8 @@ def report(
     lines = ["# Daily AI Job Hunter", "", f"Generated: {datetime.now(timezone.utc).isoformat()}",
              "", f"Jobs analyzed: {len(items)}; eligible: {len(by_status[Eligibility.eligible])}; review: {len(by_status[Eligibility.review])}; rejected: {len(by_status[Eligibility.rejected])}",
              "", "> Verification is conservative. 'Eligible' requires a successful official ATS job-detail check and explicit remote/Poland evidence. A successful ATS detail response does not guarantee the application form accepts submissions.", ""]
+    if ai_assessments:
+        lines += ["> Privacy: AI evidence details may contain candidate experience. Keep this report local unless explicitly sharing it after review.", ""]
 
     if discovery_summary is not None:
         lines += [
@@ -68,14 +73,17 @@ def report(
     for status in (Eligibility.eligible, Eligibility.review, Eligibility.rejected):
         lines += [f"## {status.value.title()} ({len(by_status[status])})", ""]
         for job, match in sorted(by_status[status], key=lambda x: x[1].score, reverse=True)[:20]:
-            lines += [f"### {job.title} — {job.company}",
+            lines += [f"### {markdown_text(job.title)} — {markdown_text(job.company)}",
                       f"- **Fit:** {match.score}/100 | **AI transition:** {match.ai_transition_score}/100 | **AI analyzed:** {match.ai_analyzed}",
-                      f"- **Location:** {job.location} | **Source:** {job.provider} | **Verified ATS detail:** {job.verified_live} ({job.verified_at or 'not checked'})",
-                      f"- **Job:** {job.url} | **Apply:** {job.apply_url or 'unknown'}",
-                      f"- **Reasons:** {'; '.join(match.reasons) or 'None established'}",
-                      f"- **Concerns:** {'; '.join(match.concerns) or 'None established'}", ""]
+                      f"- **Location:** {markdown_text(job.location)} | **Source:** {markdown_text(job.provider)} | **Verified ATS detail:** {job.verified_live} ({markdown_text(job.verified_at or 'not checked')})",
+                      f"- **Job:** {markdown_text(str(job.url))} | **Apply:** {markdown_text(str(job.apply_url or 'unknown'))}",
+                      f"- **Reasons:** {markdown_text('; '.join(match.reasons) or 'None established')}",
+                      f"- **Concerns:** {markdown_text('; '.join(match.concerns) or 'None established')}", ""]
             if getattr(match, 'ai_backend', None):
                 lines.insert(len(lines) - 1, f"- **AI backend:** {match.ai_backend}")
+            assessment = (ai_assessments or {}).get(job.key)
+            if match.ai_analyzed and assessment is not None:
+                lines += assessment_lines(assessment, candidate_contexts)
     if errors:
         lines += ["## Collection / verification errors", ""]
 
@@ -141,6 +149,7 @@ async def run(args):
     boards = cfg.get('boards', []) or []
     collection_errors = []
     ai_errors = []
+    ai_assessments = {}
     normalization_warnings = []
     verification_errors = []
     jobs = []
@@ -203,9 +212,13 @@ async def run(args):
             try:
                 assessor = assess_requirements_agent if match.ai_backend == 'agent' else assess_requirements
                 assessment = await assessor(profile, job.description, args.model)
+                # Provenance flags must come from our validators, not the model.
+                for requirement in assessment.requirements:
+                    requirement.evidence_validation = None
                 technical = grounded_technical_eligibility(assessment, profile, job.description)
                 match.eligibility = combine_eligibility(match.eligibility, technical)
                 match.ai_analyzed = True
+                ai_assessments[job.key] = assessment.model_copy(deep=True)
                 if technical == Eligibility.review:
                     match.concerns.append("AI technical requirements need review: missing, uncertain, or ungrounded evidence")
                 else:
@@ -256,6 +269,8 @@ async def run(args):
         normalization_warnings=normalization_warnings,
         verification_errors=verification_errors,
         discovery_summary=discovery_summary,
+        ai_assessments=ai_assessments,
+        candidate_contexts=[experience.get('context', '') for experience in profile.get('skill_experiences', [])] if ai_assessments else None,
     )
     warning_count = (
             len(collection_errors)
