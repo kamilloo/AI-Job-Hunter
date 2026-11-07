@@ -49,6 +49,8 @@ Open `reports/daily.md` to inspect ranked results and evidence. If no company bo
 
 The SDK backend uses `Agent` and `Runner` through Gemini's OpenAI-compatible endpoint. Both backends use the same instructions, `TechnicalAssessment` output model, quotation checks, and eligibility combination. The old score-based `JobAnalysis` recommendation is not used by either backend. Reports identify the selected backend for attempted AI analyses. OpenAI API credentials are unnecessary.
 
+Use `--ai --max-ai-jobs 5` to attempt AI assessment for at most five jobs, in collection order, with either backend. The default is unlimited; `0` disables AI attempts. Failed assessments count toward the cap. Deterministically rejected jobs and jobs already marked applied, skipped, or dismissed do not consume it. Remaining non-rejected jobs stay in the report as `review`, with `AI analyzed: False` and a limit-reached concern. The limit requires `--ai` and must be a non-negative integer. It limits job assessment attempts, not HTTP requests or cost: a native Gemini assessment can retry internally. Collection and ATS verification still process all jobs.
+
 The SDK backend disables tracing, uses one agent turn with no tools or handoffs, disables client retries, and applies a 60-second client timeout plus a 75-second runner timeout. It does not provide the native Gemini backend's usage/cost events or HTTP retry instrumentation. SDK/schema compatibility and SDK request/response processing are tested locally against an in-memory transport (with platform discovery isolated); live Gemini compatibility must be checked separately for each backend. Platform discovery through the SDK's worker thread stalled in the restricted test environment and remains a live-environment verification item. Missing SDK dependencies or failed SDK calls produce visible AI errors and review outcomes, with no automatic backend fallback.
 
 Set `GEMINI_API_KEY` in your environment or local `.env`. Set `GEMINI_MODEL` to a model supported by your account; the repository default is `gemini-3.5-flash-lite`. `--model` overrides `GEMINI_MODEL`. Empty keys and malformed model IDs are rejected; account access and model availability require a live call. OpenAI environment variables are ignored.
@@ -59,12 +61,12 @@ After explicitly deciding to incur provider costs, an optional manual Gemini smo
 source .venv/bin/activate
 # Set GEMINI_API_KEY securely in .env; do not commit it.
 export GEMINI_MODEL='gemini-3.5-flash-lite'  # replace if unsupported by your account
-job-hunter --ai --model "$GEMINI_MODEL" \
+job-hunter --ai --max-ai-jobs 1 --model "$GEMINI_MODEL" \
   --profile config/profile.yaml --sources config/sources.yaml \
   --database /tmp/job-hunter-ai-smoke.sqlite3 --output /tmp/job-hunter-ai-smoke.md
 ```
 
-Use a sources file containing one official company board to bound discovery, and a fresh disposable database. This command may analyze **every non-rejected job** on that board; it is not a single-call test. Inspect the report's eligibility counts, `AI analyzed` fields, concerns and AI error section. For a single-case provider test using the separate evaluation runner, use `python -m evaluations.run_ai_evaluation --job-id E05`. No live provider integration or production readiness is claimed from mocked tests.
+Use a sources file containing one official company board to bound discovery, and a fresh disposable database. This command attempts AI assessment for at most one job; internal retries may still make more than one provider request. Inspect the report's eligibility counts, `AI analyzed` fields, concerns and AI error section. For a single-case provider test using the separate evaluation runner, use `python -m evaluations.run_ai_evaluation --job-id E05`. No live provider integration or production readiness is claimed from mocked tests.
 
 The CLI checks employer quotations against the job description and candidate quotations against concrete `skill_experiences` contexts. Both CLI and AI evaluation use the supplied profile and the assessor’s instructions distinguishing career interests and bare skill lists from concrete experience. Candidate quotations are checked only against `skill_experiences` contexts. Empty assessments, no mandatory requirements, ungrounded evidence, and unknown or unmet mandatory requirements require `review`. AI never upgrades deterministic `review` or `rejected`; hard rejections skip AI entirely. A failed call or invalid output leaves `AI analyzed: False`, moves a non-rejected job to `review`, and adds a diagnostic exception type without raw provider messages. Warnings appear in the report and console count; partial AI failures do not change the CLI exit code.
 

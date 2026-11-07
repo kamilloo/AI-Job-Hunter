@@ -164,3 +164,70 @@ def test_invalid_backend_arguments(monkeypatch, arguments):
     with pytest.raises(SystemExit) as error:
         main()
     assert error.value.code == 2
+
+
+@pytest.mark.parametrize('backend', ['gemini', 'agent'])
+@pytest.mark.parametrize('limit', [None, 0, 1, 2])
+@pytest.mark.parametrize('fails', [False, True], ids=['success', 'failure'])
+def test_max_ai_jobs_caps_attempts_and_preserves_all_results(tmp_path, backend, limit, fails):
+    import sqlite3
+    import job_hunter.cli as cli
+
+    args = make_args(tmp_path, ai=True)
+    args.ai_backend = backend
+    args.max_ai_jobs = limit
+    args.profile.write_text(yaml.safe_dump(PROFILE))
+    jobs = [make_job(str(i), 'Frontend Developer' if i == 0 else 'Backend Engineer') for i in range(5)]
+    for job in jobs:
+        job.remote = True
+        job.verified_live = True
+    # Neither deterministic rejection nor an already-dismissed job uses budget.
+    with sqlite3.connect(args.database) as conn:
+        cli.db_init(conn)
+        cli.save_job(conn, jobs[1])
+        conn.execute('UPDATE jobs SET status=? WHERE key=?', ('dismissed', jobs[1].key))
+    assessor = AsyncMock(return_value=assessment(), side_effect=ValueError('private error') if fails else None)
+    with (
+        patch('job_hunter.cli.collect_with_diagnostics', new=AsyncMock(return_value=CollectionResult(jobs=jobs))),
+        patch('job_hunter.cli.verify_detail', new=AsyncMock(return_value=VerificationResult(verified=True))),
+        patch('job_hunter.cli.assess_requirements_agent' if backend == 'agent' else 'job_hunter.cli.assess_requirements', new=assessor),
+        patch('job_hunter.cli.report', wraps=cli.report) as report_call,
+    ):
+        asyncio.run(run(args))
+    expected_attempts = 3 if limit is None else min(3, limit)
+    assert assessor.await_count == expected_attempts
+    items = report_call.call_args.args[0]
+    assert [job.key for job, match in items] == [jobs[i].key for i in (0, 2, 3, 4)]
+    assert items[0][1].eligibility == Eligibility.rejected
+    for index, (job, match) in enumerate(items[1:]):
+        attempted = index < expected_attempts
+        assert match.ai_analyzed == (attempted and not fails)
+        assert match.eligibility == (Eligibility.eligible if attempted and not fails else Eligibility.review)
+        assert any('--max-ai-jobs limit reached' in concern for concern in match.concerns) == (not attempted)
+    assert len(report_call.call_args.kwargs['ai_errors']) == (expected_attempts if fails else 0)
+    content = args.output.read_text()
+    assert 'private error' not in content
+    assert content.count('--max-ai-jobs limit reached') == 3 - expected_attempts
+
+
+@pytest.mark.parametrize('value', ['0', '1', '10'])
+def test_max_ai_jobs_argument_parsing(monkeypatch, value):
+    monkeypatch.setattr(sys, 'argv', ['job-hunter', '--ai', '--max-ai-jobs', value])
+    with patch('job_hunter.cli.run', new=AsyncMock()) as run_call:
+        main()
+    assert run_call.call_args.args[0].max_ai_jobs == int(value)
+
+
+@pytest.mark.parametrize('arguments', [
+    ['--ai', '--max-ai-jobs', '-1'],
+    ['--ai', '--max-ai-jobs', '1.5'],
+    ['--ai', '--max-ai-jobs', 'invalid'],
+    ['--max-ai-jobs', '1'],
+])
+def test_invalid_max_ai_jobs_arguments(monkeypatch, arguments):
+    monkeypatch.setattr(sys, 'argv', ['job-hunter', *arguments])
+    with patch('job_hunter.cli.run', new=AsyncMock()) as run_call:
+        with pytest.raises(SystemExit) as error:
+            main()
+    assert error.value.code == 2
+    run_call.assert_not_called()

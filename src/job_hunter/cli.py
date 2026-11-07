@@ -186,12 +186,19 @@ async def run(args):
     db_init(conn)
     known = {row[0]:row[1] for row in conn.execute('SELECT key,status FROM jobs')}
     items = []
+    ai_attempts = 0
+    max_ai_jobs = getattr(args, 'max_ai_jobs', None)
     for job in jobs:
         if known.get(job.key) in ('applied','skipped','dismissed'):
             continue
         match = evaluate(job, profile)
-        if args.ai and match.eligibility != Eligibility.rejected:
+        if (args.ai and match.eligibility != Eligibility.rejected
+                and max_ai_jobs is not None and ai_attempts >= max_ai_jobs):
+            match.eligibility = Eligibility.review
+            match.concerns.append("AI assessment skipped: --max-ai-jobs limit reached; technical eligibility requires review")
+        elif args.ai and match.eligibility != Eligibility.rejected:
             match.ai_backend = getattr(args, 'ai_backend', 'gemini')
+            ai_attempts += 1
             try:
                 assessor = assess_requirements_agent if match.ai_backend == 'agent' else assess_requirements
                 assessment = await assessor(profile, job.description, args.model)
@@ -273,7 +280,14 @@ def main():
     parser.add_argument('--ai-backend', choices=('gemini', 'agent'), default='gemini',
                         help='AI execution backend (default: gemini HTTP; agent requires the [ai] extra)')
     parser.add_argument('--model', help='Gemini model ID; defaults to GEMINI_MODEL')
+    parser.add_argument('--max-ai-jobs', type=int, default=None,
+                        help='Maximum AI assessment attempts in collection order (default: unlimited; 0 disables attempts)')
     args = parser.parse_args()
+    if args.max_ai_jobs is not None:
+        if args.max_ai_jobs < 0:
+            parser.error('--max-ai-jobs must be non-negative')
+        if not args.ai:
+            parser.error('--max-ai-jobs requires --ai')
     if args.ai_backend != 'gemini' and not args.ai:
         parser.error('--ai-backend agent requires --ai')
     if args.ai:
