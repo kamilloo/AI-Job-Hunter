@@ -190,6 +190,7 @@ async def run(args):
     max_ai_jobs = getattr(args, 'max_ai_jobs', None)
     for job in jobs:
         if known.get(job.key) in ('applied','skipped','dismissed'):
+            save_job(conn, job)
             continue
         match = evaluate(job, profile)
         if (args.ai and match.eligibility != Eligibility.rejected
