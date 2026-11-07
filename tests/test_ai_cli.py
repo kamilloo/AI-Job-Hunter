@@ -167,7 +167,7 @@ def test_invalid_backend_arguments(monkeypatch, arguments):
 
 
 @pytest.mark.parametrize('backend', ['gemini', 'agent'])
-@pytest.mark.parametrize('limit', [None, 0, 1, 2])
+@pytest.mark.parametrize('limit', [None, 1, 2])
 @pytest.mark.parametrize('fails', [False, True], ids=['success', 'failure'])
 def test_max_ai_jobs_caps_attempts_and_preserves_all_results(tmp_path, backend, limit, fails):
     import sqlite3
@@ -210,7 +210,7 @@ def test_max_ai_jobs_caps_attempts_and_preserves_all_results(tmp_path, backend, 
     assert content.count('--max-ai-jobs limit reached') == 3 - expected_attempts
 
 
-@pytest.mark.parametrize('value', ['0', '1', '10'])
+@pytest.mark.parametrize('value', ['1', '10'])
 def test_max_ai_jobs_argument_parsing(monkeypatch, value):
     monkeypatch.setattr(sys, 'argv', ['job-hunter', '--ai', '--max-ai-jobs', value])
     with patch('job_hunter.cli.run', new=AsyncMock()) as run_call:
@@ -219,6 +219,7 @@ def test_max_ai_jobs_argument_parsing(monkeypatch, value):
 
 
 @pytest.mark.parametrize('arguments', [
+    ['--ai', '--max-ai-jobs', '0'],
     ['--ai', '--max-ai-jobs', '-1'],
     ['--ai', '--max-ai-jobs', '1.5'],
     ['--ai', '--max-ai-jobs', 'invalid'],

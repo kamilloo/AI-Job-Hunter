@@ -281,11 +281,11 @@ def main():
                         help='AI execution backend (default: gemini HTTP; agent requires the [ai] extra)')
     parser.add_argument('--model', help='Gemini model ID; defaults to GEMINI_MODEL')
     parser.add_argument('--max-ai-jobs', type=int, default=None,
-                        help='Maximum AI assessment attempts in collection order (default: unlimited; 0 disables attempts)')
+                        help='Positive maximum AI assessment attempts in collection order (default: unlimited)')
     args = parser.parse_args()
     if args.max_ai_jobs is not None:
-        if args.max_ai_jobs < 0:
-            parser.error('--max-ai-jobs must be non-negative')
+        if args.max_ai_jobs <= 0:
+            parser.error('--max-ai-jobs must be a positive integer')
         if not args.ai:
             parser.error('--max-ai-jobs requires --ai')
     if args.ai_backend != 'gemini' and not args.ai:
