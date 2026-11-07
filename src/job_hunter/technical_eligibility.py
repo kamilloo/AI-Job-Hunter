@@ -48,6 +48,11 @@ def grounded_technical_eligibility(
         requirement.evidence_validation = validate_job_evidence(job_description, requirement.job_evidence)
         if not requirement.evidence_validation.valid:
             grounded = False
-        if requirement.status != RequirementStatus.unknown and not validate_candidate_evidence(contexts, requirement.candidate_evidence).valid:
+        candidate_grounded = (
+            validate_candidate_evidence(contexts, requirement.candidate_evidence).valid
+            if requirement.candidate_evidence.strip()
+            else requirement.status == RequirementStatus.unknown
+        )
+        if not candidate_grounded:
             grounded = False
     return technical_eligibility(assessment) if grounded else Eligibility.review
