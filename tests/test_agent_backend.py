@@ -17,6 +17,10 @@ from job_hunter.model.RequirementAssessment import TechnicalAssessment
 ])
 def test_sdk_configuration_and_output_validation(monkeypatch, output):
     monkeypatch.setenv('GEMINI_API_KEY', 'test-key')
+    profile = {'skill_experiences': [{
+        'technology': 'Docker', 'years': 2,
+        'context': 'Operated Docker containers in production.',
+    }]}
     client = object()
     context = MagicMock()
     context.__aenter__ = AsyncMock(return_value=client)
@@ -30,11 +34,11 @@ def test_sdk_configuration_and_output_validation(monkeypatch, output):
     )
     with patch.dict(sys.modules, {'agents': sdk, 'openai': SimpleNamespace(AsyncOpenAI=factory)}):
         if output:
-            result = asyncio.run(assess_requirements_agent({}, 'Employer text', 'test-model'))
+            result = asyncio.run(assess_requirements_agent(profile, 'Employer text', 'test-model'))
             assert isinstance(result, TechnicalAssessment)
         else:
             with pytest.raises(ValueError):
-                asyncio.run(assess_requirements_agent({}, 'Employer text', 'test-model'))
+                asyncio.run(assess_requirements_agent(profile, 'Employer text', 'test-model'))
     factory.assert_called_once_with(
         api_key='test-key', base_url='https://generativelanguage.googleapis.com/v1beta/openai/',
         timeout=60, max_retries=0,
@@ -44,7 +48,11 @@ def test_sdk_configuration_and_output_validation(monkeypatch, output):
     assert sdk.Agent.call_args.kwargs['instructions'] == ASSESSMENT_INSTRUCTIONS
     sdk.RunConfig.assert_called_once_with(tracing_disabled=True, trace_include_sensitive_data=False)
     assert sdk.Runner.run.call_args.kwargs['max_turns'] == 1
-    assert sdk.Runner.run.call_args.args[1] == build_prompt({}, 'Employer text')
+    prompt = sdk.Runner.run.call_args.args[1]
+    assert prompt == build_prompt(profile, 'Employer text')
+    assert '"E1": "skill_experiences[0].context"' in prompt
+    assert prompt.count('Operated Docker containers in production.') == 1
+    assert 'copied verbatim' in sdk.Agent.call_args.kwargs['instructions']
     context.__aexit__.assert_awaited_once()
 
 
